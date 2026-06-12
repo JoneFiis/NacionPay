@@ -1,10 +1,15 @@
 const express = require('express');
+const cors = require('cors');
 const { registrarUsuario } = require('./registro');
 const { autenticarUsuario } = require('./auth');
 const { ejecutarTransferenciaIntrabanco } = require('./transferencia');
 const { procesarTransferenciaInterbanco } = require('./transferenciaCCE');
 const { AntifraudeEngine } = require('./antifraudeEngine');
+
 const app = express();
+
+// CORRECCIÓN CLAVE: Activar la conexión abierta para el Frontend (CORS)
+app.use(cors());
 app.use(express.json());
 
 const repositorio = {
@@ -27,7 +32,7 @@ app.post('/api/antifraude/verificar', async (req, res) => { try { res.status(200
 
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`NaciónPay API en puerto ${PORT}`));
+  app.listen(PORT, () => console.log(`NaciónPay API en puerto 3000`));
 }
 
 module.exports = { app, repositorio };
