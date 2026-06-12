@@ -30,7 +30,6 @@
 
     <div class="mobile-container flex flex-col relative overflow-hidden">
         
-        <!-- PANTALLA 1: LOGIN PRINCIPAL -->
         <div id="screen-login" class="absolute inset-0 yape-purple flex flex-col justify-between p-7 z-50 transition-transform duration-300">
             <div class="flex flex-col items-center mt-16 space-y-3">
                 <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg">
@@ -61,7 +60,6 @@
             </div>
         </div>
 
-        <!-- PANTALLA 2: SEGUNDA HOJA - REGISTRO DE NUEVA CUENTA -->
         <div id="screen-register" class="absolute inset-0 bg-slate-50 flex flex-col justify-between p-6 z-50 translate-x-full transition-transform duration-300 overflow-y-auto hide-scroll">
             <div class="space-y-5">
                 <div class="flex items-center gap-2 pt-2">
@@ -108,7 +106,6 @@
             </div>
         </div>
 
-        <!-- PANTALLA 3: INTERFAZ DE USUARIO LOGUEADO -->
         <div id="screen-main" class="hidden flex-col h-full w-full">
             
             <header class="yape-purple text-white px-5 pt-5 pb-4 flex items-center justify-between shadow-md shrink-0">
@@ -134,7 +131,6 @@
 
             <main class="flex-1 overflow-y-auto p-4 pb-24 hide-scroll">
                 
-                <!-- SECCIÓN: HOME / BALANCE / ENVIOS -->
                 <div id="tab-home" class="view-section space-y-4">
                     <div class="bg-gradient-to-br from-[#73122b] to-[#4d0b1c] p-5 rounded-2xl text-white shadow-md relative overflow-hidden">
                         <p class="text-xs text-white/70 font-medium">Saldo disponible</p>
@@ -143,7 +139,7 @@
                             <span id="wallet-balance" class="text-3xl font-black tracking-tight">1,450.00</span>
                         </div>
                         <div class="mt-4 pt-3 border-t border-white/10 flex justify-between text-xs text-white/80">
-                            <span>Billetera ID: <strong id="wallet-id">WP-982110</strong></span>
+                            <span>Billetera ID: <strong id="wallet-id">WP-777777</strong></span>
                             <i class="fa-solid fa-eye-slash cursor-pointer"></i>
                         </div>
                     </div>
@@ -184,7 +180,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN: CURSOS INTERACTIVOS CON REPRODUCTOR DE VIDEO INSTRUCTIVO -->
                 <div id="tab-cursos" class="view-section hidden space-y-4">
                     <div class="pb-1">
                         <h3 class="text-lg font-black text-slate-800">Cursos y Capacitación</h3>
@@ -234,7 +229,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN: ANTIFRAUDE LAFT -->
                 <div id="tab-antifraude" class="view-section hidden space-y-4">
                     <div class="pb-1">
                         <h3 class="text-lg font-black text-slate-800">Seguridad Antifraude</h3>
@@ -258,7 +252,6 @@
 
             </main>
 
-            <!-- MENÚ DE NAVEGACIÓN INFERIOR SIMPLIFICADO DE 3 SECCIONES -->
             <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-6 flex justify-around items-center shadow-xl shrink-0 z-40">
                 <button onclick="cambiarPestaña('home')" id="btn-nav-home" class="flex flex-col items-center gap-0.5 text-yape font-bold transition-colors">
                     <i class="fa-solid fa-house-chimney text-base"></i><span class="text-[9px]">Inicio</span>
@@ -275,7 +268,6 @@
 
     </div>
 
-    <!-- MODAL INTEGRADO DE TRANSFERENCIAS -->
     <div id="modal-tx" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
         <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -298,177 +290,6 @@
     </div>
 
     <script>
-        const BASE_API = "http://localhost:3000/api";
-        let biometriaVerificada = false;
-
-        function irAPantallaRegistro() {
-            document.getElementById('screen-register').classList.remove('translate-x-full');
-        }
-
-        function regresarAlLogin() {
-            document.getElementById('screen-register').classList.add('translate-x-full');
-        }
-
-        function autenticarAcceso() {
-            const dni = document.getElementById('login-dni').value;
-            const pin = document.getElementById('login-pin').value;
-
-            if (!dni || !pin) {
-                return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y tu PIN de seguridad.', confirmButtonColor: '#73122b' });
-            }
-
-            fetch(`${BASE_API}/usuarios/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni: dni, pin: pin })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error("Credenciales inválidas");
-                return res.json();
-            })
-            .then(data => {
-                document.getElementById('user-display-name').innerText = data.usuario.nombres || "Usuario Autenticado";
-                document.getElementById('screen-login').classList.add('translate-y-[-100%]');
-                setTimeout(() => {
-                    document.getElementById('screen-login').classList.add('hidden');
-                    document.getElementById('screen-main').classList.remove('hidden');
-                    document.getElementById('screen-main').classList.add('flex');
-                }, 300);
-                Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
-            })
-            .catch(() => {
-                document.getElementById('screen-login').classList.add('hidden');
-                document.getElementById('screen-main').classList.remove('hidden');
-                document.getElementById('screen-main').classList.add('flex');
-                Swal.fire({ icon: 'info', title: 'Modo Offline', text: 'Cargando interfaz para desarrollo local sin conexión activa.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
-            });
-        }
-
-        function capturarHuellaDigital() {
-            biometriaVerificada = true;
-            document.getElementById('lbl-huella').innerText = "Huella Dactilar Capturada";
-            Swal.fire({ icon: 'success', title: 'Biometría Correcta', text: 'Firma dactilar guardada en el buffer del sistema.', confirmButtonColor: '#73122b', timer: 1200, showConfirmButton: false });
-        }
-
-        function procesarRegistroBilletera() {
-            const dni = document.getElementById('reg-dni').value;
-            const celular = document.getElementById('reg-celular').value;
-            const nombres = document.getElementById('reg-nombres').value;
-            const pin = document.getElementById('reg-pin').value;
-
-            if (!dni || !celular || !nombres || !pin) {
-                return Swal.fire({ icon: 'warning', title: 'Campos Vacíos', text: 'Por favor, completa todo el formulario de alta.', confirmButtonColor: '#73122b' });
-            }
-            if (!biometriaVerificada) {
-                return Swal.fire({ icon: 'info', title: 'Falta Biometría', text: 'La captura de huella es obligatoria para cumplir la norma.', confirmButtonColor: '#73122b' });
-            }
-
-            fetch(`${BASE_API}/usuarios/registrar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni, celular, nombres, apellidos: '', pin })
-            })
-            .then(res => res.json())
-            .then(() => {
-                Swal.fire({ icon: 'success', title: '¡Billetera Creada!', text: 'Se registró tu cuenta de manera exitosa.', confirmButtonColor: '#73122b' });
-                regresarAlLogin();
-            })
-            .catch(() => {
-                Swal.fire({ icon: 'success', title: 'Registro Guardado', text: 'Billetera simulada registrada para testing local.', confirmButtonColor: '#73122b' });
-                regresarAlLogin();
-            });
-        }
-
-        function cambiarPestaña(tab) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.remove('text-yape'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.add('text-slate-400'));
-
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-nav-${tab}`).classList.remove('text-slate-400');
-            document.getElementById(`btn-nav-${tab}`).classList.add('text-yape');
-        }
-
-        function lanzarModuloVideo(nombreCurso) {
-            document.getElementById('video-player-container').classList.remove('hidden');
-            document.getElementById('video-player-title').innerText = `Reproduciendo: ${nombreCurso} - Video Instructivo 1`;
-            Swal.fire({ icon: 'success', title: 'Inscripción Exitosa', text: 'Iniciando reproducción multimedia instructiva.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
-        }
-
-        function cerrarVideoPlayer() {
-            document.getElementById('video-player-container').classList.add('hidden');
-        }
-
-        function cerrarSesion() {
-            document.getElementById('screen-main').classList.remove('flex');
-            document.getElementById('screen-main').classList.add('hidden');
-            document.getElementById('screen-login').classList.remove('hidden');
-            document.getElementById('screen-login').classList.remove('translate-y-[-100%]');
-            document.getElementById('login-dni').value = '';
-            document.getElementById('login-pin').value = '';
-        }
-
-        function abrirModalTransferir(tipo) {
-            document.getElementById('modal-tx-type').value = tipo;
-            document.getElementById('modal-tx-title').innerText = tipo === 'intrabanco' ? 'Transferencia Directa (NaciónPay)' : 'Transferencia Interbancaria CCE';
-            document.getElementById('modal-tx').classList.remove('hidden');
-        }
-
-        function cerrarModalTransferir() {
-            document.getElementById('modal-tx').classList.add('hidden');
-            document.getElementById('modal-tx-amount').value = '';
-            document.getElementById('modal-tx-phone').value = '';
-        }
-
-        function procesarEnvioDinero() {
-            const monto = parseFloat(document.getElementById('modal-tx-amount').value);
-            const celular = document.getElementById('modal-tx-phone').value;
-            const tipo = document.getElementById('modal-tx-type').value;
-
-            if (!monto || !celular) {
-                return Swal.fire({ icon: 'warning', title: 'Error', text: 'Ingresa un monto y un número celular válido.', confirmButtonColor: '#73122b' });
-            }
-
-            fetch(`${BASE_API}/transferencias/enviar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monto, celularDestino: celular, tipo })
-            })
-            .then(async res => {
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || "Operación denegada");
-                return data;
-            })
-            .then(() => {
-                cerrarModalTransferir();
-                Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación completada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
-            })
-            .catch(err => {
-                cerrarModalTransferir();
-                Swal.fire({ icon: 'error', title: 'Operación Rechazada', text: err.message || 'Error en pasarela de pagos.', confirmButtonColor: '#73122b' });
-            });
-        }
-
-        function auditarAlertasEnVivo() {
-            fetch(`${BASE_API}/antifraude/alertas`)
-            .then(res => res.json())
-            .then(data => {
-                let logHtml = '<div class="space-y-2 text-left text-xs">';
-                if(data.alertas && data.alertas.length > 0) {
-                    data.alertas.forEach(a => {
-                        logHtml += `<div class="p-2 bg-red-50 border border-red-200 rounded-lg text-red-800 font-medium">🚨 [${a.tipo}] - Celular: ${a.celular} - Motivo: ${a.motivo}</div>`;
-                    });
-                } else {
-                    logHtml += '<div class="text-center text-slate-500 py-3">No hay alertas críticas de estructuración ni transgresión de umbral.</div>';
-                }
-                logHtml += '</div>';
-                Swal.fire({ title: 'Auditoría LAFT Activa', html: logHtml, confirmButtonColor: '#73122b' });
-            })
-            .catch(() => {
-                Swal.fire({ title: 'Auditoría LAFT Activa', text: 'Análisis del motor: Cero patrones sospechosos fraccionados bajo el umbral legal de S/. 10,000.', icon: 'info', confirmButtonColor: '#73122b' });
-            });
-        }
-    <script>
         const BASE_API = "http://127.0.0.1:3000/api";
         let biometriaVerificada = false;
 
@@ -481,17 +302,17 @@
         }
 
         function autenticarAcceso() {
-            const dni = document.getElementById('login-dni').value;
-            const pin = document.getElementById('login-pin').value;
+            const dniInput = document.getElementById('login-dni').value;
+            const pinInput = document.getElementById('login-pin').value;
 
-            if (!dni || !pin) {
+            if (!dniInput || !pinInput) {
                 return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y tu PIN de seguridad.', confirmButtonColor: '#73122b' });
             }
 
             fetch(`${BASE_API}/auth`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni, pin })
+                body: JSON.stringify({ dni: dniInput, pin: pinInput })
             })
             .then(async res => {
                 const text = await res.text();
@@ -500,7 +321,7 @@
                 return data;
             })
             .then(data => {
-                document.getElementById('user-display-name').innerText = data.nombre || "Usuario Autenticado";
+                document.getElementById('user-display-name').innerText = data.usuario?.nombres || "Jone";
                 document.getElementById('screen-login').classList.add('translate-y-[-100%]');
                 setTimeout(() => {
                     document.getElementById('screen-login').classList.add('hidden');
@@ -510,7 +331,7 @@
                 Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
             })
             .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Fallo de Ingreso', text: err.message, confirmButtonColor: '#73122b' });
+                Swal.fire({ icon: 'error', title: 'Acceso Denegado', text: err.message, confirmButtonColor: '#73122b' });
             });
         }
 
@@ -521,12 +342,12 @@
         }
 
         function procesarRegistroBilletera() {
-            const dni = document.getElementById('reg-dni').value;
-            const celular = document.getElementById('reg-celular').value;
-            const nombres = document.getElementById('reg-nombres').value;
-            const pin = document.getElementById('reg-pin').value;
+            const dniVal = document.getElementById('reg-dni').value;
+            const celularVal = document.getElementById('reg-celular').value;
+            const nombresVal = document.getElementById('reg-nombres').value;
+            const pinVal = document.getElementById('reg-pin').value;
 
-            if (!dni || !celular || !nombres || !pin) {
+            if (!dniVal || !celularVal || !nombresVal || !pinVal) {
                 return Swal.fire({ icon: 'warning', title: 'Campos Vacíos', text: 'Por favor, completa todo el formulario de alta.', confirmButtonColor: '#73122b' });
             }
             if (!biometriaVerificada) {
@@ -536,7 +357,7 @@
             fetch(`${BASE_API}/registro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni, celular, nombres, pin })
+                body: JSON.stringify({ dni: dniVal, celular: celularVal, nombres: nombresVal, pin: pinVal })
             })
             .then(async res => {
                 const text = await res.text();
