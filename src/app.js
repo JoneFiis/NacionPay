@@ -51,9 +51,8 @@ app.post('/api/transferencia/intrabanco', async (req, res) => { try { res.status
 app.post('/api/transferencia/interbanco', async (req, res) => { try { res.status(200).json(await procesarTransferenciaInterbanco(req.body, repositorio, gatewayMock)); } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); } });
 app.post('/api/antifraude/verificar', async (req, res) => { try { res.status(200).json((new AntifraudeEngine()).detectarPatronEstructuracion(req.body.historial, req.body.nuevaTx)); } catch (e) { res.status(400).json({ error: e.message }); } });
 
+// Busca este bloque al final de tu app.js y déjalo así:
 if (process.env.NODE_ENV !== 'test') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`NaciónPay API en puerto 3000`));
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`NaciónPay API en puerto 5000`));
 }
-
-module.exports = { app, repositorio };
