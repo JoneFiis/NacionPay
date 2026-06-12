@@ -1,779 +1,331 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NaciónPay — Billetera Digital del Banco de la Nación</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-body { font-family: 'Inter', sans-serif; }
-.guinda { background-color: #7B1F3A; }
-.guinda-text { color: #7B1F3A; }
-.guinda-light { background-color: #9B2D4F; }
-.guinda-hover:hover { background-color: #5A1530; }
-.guinda-border { border-color: #7B1F3A; }
-.guinda-ring:focus { --tw-ring-color: #7B1F3A; }
-.bg-pattern {
-  background-image: radial-gradient(circle at 1px 1px, rgba(123,31,58,0.08) 1px, transparent 0);
-  background-size: 24px 24px;
-}
-.siren {
-  animation: siren-pulse 1s ease-in-out infinite;
-}
-@keyframes siren-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); }
-  50% { box-shadow: 0 0 0 20px rgba(239,68,68,0); }
-}
-.shake {
-  animation: shake 0.5s ease-in-out;
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
-}
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.slide-in {
-  animation: slideIn 0.3s ease-out;
-}
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(-16px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-.spinner {
-  border: 3px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top: 3px solid white;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-  display: inline-block;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.toast-enter {
-  animation: toastEnter 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes toastEnter {
-  from { transform: translateX(120%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-.toast-exit {
-  animation: toastExit 0.3s ease-in forwards;
-}
-@keyframes toastExit {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(120%); opacity: 0; }
-}
-.tab-active {
-  background-color: #7B1F3A;
-  color: white;
-}
-.tab-inactive {
-  background-color: transparent;
-  color: #6B7280;
-}
-.tab-inactive:hover {
-  background-color: #F3F4F6;
-  color: #374151;
-}
-.card-shadow {
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-}
-.input-focus:focus {
-  outline: none;
-  border-color: #7B1F3A;
-  box-shadow: 0 0 0 3px rgba(123,31,58,0.15);
-}
-.biometric-btn {
-  background: linear-gradient(135deg, #7B1F3A 0%, #9B2D4F 100%);
-  transition: all 0.3s ease;
-}
-.biometric-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(123,31,58,0.3);
-}
-.biometric-btn:active {
-  transform: translateY(0);
-}
-.saldo-blur {
-  filter: blur(8px);
-  user-select: none;
-}
-.alert-card {
-  transition: all 0.3s ease;
-}
-.alert-card:hover {
-  transform: translateY(-2px);
-}
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #f1f1f1; }
-::-webkit-scrollbar-thumb { background: #7B1F3A; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #5A1530; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NaciónPay</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        .bn-guinda { background-color: #73122b; }
+        .bn-guinda-dark { background-color: #540b1e; }
+        .text-bn { color: #73122b; }
+        .mobile-container {
+            max-width: 425px;
+            width: 100%;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: 0 0 25px rgba(0,0,0,0.5);
+        }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen bg-pattern">
+<body class="flex justify-center items-center min-h-screen">
 
-<div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
-
-<div class="min-h-screen flex">
-  <aside class="w-72 guinda text-white flex flex-col shadow-2xl">
-    <div class="p-8 border-b border-white/10">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight">NaciónPay</h1>
-          <p class="text-xs text-white/60 font-medium">Banco de la Nación</p>
-        </div>
-      </div>
-    </div>
-    <nav class="flex-1 p-4 space-y-2">
-      <button onclick="switchTab('registro')" id="nav-registro" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-left font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-        <span>Registro</span>
-      </button>
-      <button onclick="switchTab('auth')" id="nav-auth" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-left font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-        <span>Autenticación</span>
-      </button>
-      <button onclick="switchTab('transferencias')" id="nav-transferencias" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-left font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-        <span>Transferencias</span>
-      </button>
-      <button onclick="switchTab('antifraude')" id="nav-antifraude" class="nav-btn w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 text-left font-medium">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        <span>Antifraude LAFT</span>
-      </button>
-    </nav>
-    <div class="p-6 border-t border-white/10">
-      <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-        <p class="text-xs text-white/70 mb-1">Estado del Sistema</p>
-        <div class="flex items-center gap-2">
-          <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
-          <span class="text-sm font-semibold">Operativo</span>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <main class="flex-1 p-8 overflow-y-auto">
-    <div id="panel-registro" class="tab-panel max-w-2xl mx-auto">
-      <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Registro de Usuario</h2>
-        <p class="text-gray-500">Complete sus datos para abrir su billetera digital</p>
-      </div>
-      <form id="form-registro" class="bg-white rounded-2xl card-shadow p-8 space-y-6">
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">DNI</label>
-            <input type="text" id="reg-dni" maxlength="8" placeholder="12345678" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            <p class="text-xs text-gray-400">8 dígitos numéricos</p>
-          </div>
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">Celular</label>
-            <input type="text" id="reg-celular" maxlength="9" placeholder="912345678" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            <p class="text-xs text-gray-400">Inicia con 9, 9 dígitos</p>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">Nombres</label>
-            <input type="text" id="reg-nombres" placeholder="Juan Carlos" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-          </div>
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">Apellidos</label>
-            <input type="text" id="reg-apellidos" placeholder="Pérez García" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="block text-sm font-semibold text-gray-700">PIN (6 dígitos)</label>
-          <input type="password" id="reg-pin" maxlength="6" placeholder="••••••" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-        </div>
-        <div class="space-y-3">
-          <label class="block text-sm font-semibold text-gray-700">Biometría</label>
-          <button type="button" id="btn-biometria" onclick="capturarBiometria()" class="biometric-btn w-full py-4 rounded-xl text-white font-semibold flex items-center justify-center gap-3">
-            <svg id="icon-huella" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.496.362 4.905 1.03 7.162"></path></svg>
-            <span id="text-biometria">Capturar Huella Biométrica</span>
-          </button>
-          <div id="biometria-status" class="hidden text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-              <span>Huella capturada correctamente</span>
-            </div>
-          </div>
-        </div>
-        <button type="submit" id="btn-registro" class="guinda guinda-hover text-white w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
-          <span id="spinner-registro" class="spinner hidden"></span>
-          <span id="text-registro">Crear Billetera</span>
-        </button>
-      </form>
-    </div>
-
-    <div id="panel-auth" class="tab-panel hidden max-w-2xl mx-auto">
-      <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Acceso a tu Billetera</h2>
-        <p class="text-gray-500">Ingrese sus credenciales para gestionar sus fondos</p>
-      </div>
-      <div id="auth-login-form">
-        <form id="form-auth" class="bg-white rounded-2xl card-shadow p-8 space-y-6">
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">DNI</label>
-            <input type="text" id="auth-dni" maxlength="8" placeholder="12345678" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-          </div>
-          <div class="space-y-2">
-            <label class="block text-sm font-semibold text-gray-700">PIN</label>
-            <input type="password" id="auth-pin" maxlength="6" placeholder="••••••" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-          </div>
-          <div id="bloqueo-banner" class="hidden bg-red-50 border border-red-200 rounded-xl p-4">
+    <div class="mobile-container flex flex-col relative overflow-hidden">
+        
+        <!-- HEADER ESTILO APP -->
+        <header class="bn-guinda text-white px-5 pt-6 pb-4 flex items-center justify-between shadow-md shrink-0">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-              </div>
-              <div>
-                <p class="text-sm font-semibold text-red-800">Cuenta Bloqueada</p>
-                <p class="text-xs text-red-600">Demasiados intentos fallidos. Espere 5 minutos.</p>
-              </div>
-            </div>
-          </div>
-          <button type="submit" id="btn-auth" class="guinda guinda-hover text-white w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
-            <span id="spinner-auth" class="spinner hidden"></span>
-            <span id="text-auth">Ingresar</span>
-          </button>
-        </form>
-      </div>
-      <div id="auth-dashboard" class="hidden space-y-6">
-        <div class="bg-white rounded-2xl card-shadow p-8">
-          <div class="flex items-center justify-between mb-6">
-            <div>
-              <p class="text-sm text-gray-500 font-medium">Bienvenido</p>
-              <h3 id="auth-nombre" class="text-2xl font-bold text-gray-900"></h3>
-            </div>
-            <button onclick="cerrarSesion()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold transition-all">Cerrar Sesión</button>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-sm font-semibold text-gray-500">Saldo Soles (PEN)</span>
-                <button onclick="toggleSaldo('pen')" class="p-1.5 hover:bg-gray-200 rounded-lg transition-all">
-                  <svg id="eye-pen" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </button>
-              </div>
-              <p id="saldo-pen" class="text-3xl font-bold text-gray-900 saldo-blur">S/ 0.00</p>
-            </div>
-            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-              <div class="flex items-center justify-between mb-3">
-                <span class="text-sm font-semibold text-gray-500">Saldo Dólares (USD)</span>
-                <button onclick="toggleSaldo('usd')" class="p-1.5 hover:bg-gray-200 rounded-lg transition-all">
-                  <svg id="eye-usd" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                </button>
-              </div>
-              <p id="saldo-usd" class="text-3xl font-bold text-gray-900 saldo-blur">$ 0.00</p>
-            </div>
-          </div>
-          <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-            <p class="text-xs text-gray-500">Billetera: <span id="auth-billetera" class="font-mono font-semibold text-gray-700"></span></p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="panel-transferencias" class="tab-panel hidden max-w-4xl mx-auto">
-      <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Transferencias</h2>
-        <p class="text-gray-500">Envíe fondos a otras billeteras o cuentas bancarias</p>
-      </div>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl card-shadow p-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 guinda-light rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-gray-900">Intrabanco</h3>
-              <p class="text-xs text-gray-500">Entre billeteras NaciónPay</p>
-            </div>
-          </div>
-          <form id="form-intra" class="space-y-4">
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">Billetera Destino</label>
-              <input type="text" id="intra-destino" placeholder="BN-1234-ABCD12" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium font-mono transition-all">
-            </div>
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">Monto (PEN)</label>
-              <input type="number" id="intra-monto" min="0.01" step="0.01" placeholder="0.00" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-            </div>
-            <button type="submit" id="btn-intra" class="guinda guinda-hover text-white w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-              <span id="spinner-intra" class="spinner hidden"></span>
-              <span id="text-intra">Transferir</span>
-            </button>
-          </form>
-        </div>
-        <div class="bg-white rounded-2xl card-shadow p-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-gray-900">Interbanco CCE</h3>
-              <p class="text-xs text-gray-500">A cualquier banco del país</p>
-            </div>
-          </div>
-          <form id="form-inter" class="space-y-4">
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">CCI Destino</label>
-              <input type="text" id="inter-cci" maxlength="20" placeholder="00212345678901234567" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium font-mono transition-all" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-              <p class="text-xs text-gray-400">20 dígitos numéricos</p>
-            </div>
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">Moneda</label>
-              <select id="inter-moneda" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all bg-white">
-                <option value="PEN">Soles (PEN)</option>
-                <option value="USD">Dólares (USD)</option>
-              </select>
-            </div>
-            <div class="space-y-2">
-              <label class="block text-sm font-semibold text-gray-700">Monto</label>
-              <input type="number" id="inter-monto" min="0.01" step="0.01" placeholder="0.00" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all" oninput="validarTopeCCE()">
-              <div id="tope-warning" class="hidden flex items-center gap-2 text-xs text-red-600 font-medium">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                <span id="tope-text">Excede el tope regulatorio</span>
-              </div>
-              <p class="text-xs text-gray-400">Tope: S/ 30,000 | $ 10,000</p>
-            </div>
-            <button type="submit" id="btn-inter" class="bg-blue-700 hover:bg-blue-800 text-white w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-              <span id="spinner-inter" class="spinner hidden"></span>
-              <span id="text-inter">Transferir Interbanco</span>
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <div id="panel-antifraude" class="tab-panel hidden max-w-4xl mx-auto">
-      <div class="mb-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-2">Simulador Antifraude LAFT</h2>
-        <p class="text-gray-500">Detección de patrones de estructuración de operaciones</p>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl card-shadow p-8 space-y-6">
-          <div>
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Generar Historial Sintético</h3>
-            <div class="space-y-4">
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700">Cantidad de transacciones</label>
-                <input type="number" id="af-cantidad" value="20" min="1" max="50" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700">Monto por transacción (PEN)</label>
-                <input type="number" id="af-monto" value="2000" min="1" step="100" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700">Intervalo entre txs (minutos)</label>
-                <input type="number" id="af-intervalo" value="5" min="1" max="120" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-              </div>
-              <button onclick="generarHistorial()" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-semibold transition-all duration-200">
-                Generar Historial
-              </button>
-            </div>
-          </div>
-          <div class="border-t border-gray-100 pt-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Nueva Operación a Verificar</h3>
-            <div class="space-y-4">
-              <div class="space-y-2">
-                <label class="block text-sm font-semibold text-gray-700">Monto (PEN)</label>
-                <input type="number" id="af-nueva-monto" value="2000" min="1" step="100" class="w-full px-4 py-3 rounded-xl border border-gray-200 input-focus text-gray-900 font-medium transition-all">
-              </div>
-              <button onclick="verificarAntifraude()" id="btn-af" class="guinda guinda-hover text-white w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                <span id="spinner-af" class="spinner hidden"></span>
-                <span id="text-af">Verificar Patrón LAFT</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="space-y-6">
-          <div id="af-resultado" class="hidden">
-            <div id="af-card-normal" class="hidden bg-green-50 border-2 border-green-200 rounded-2xl p-8 alert-card">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                  <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
+                    <i class="fa-solid font-bold text-white text-lg">N₱</i>
                 </div>
                 <div>
-                  <h4 class="text-xl font-bold text-green-800">Operación Normal</h4>
-                  <p class="text-sm text-green-600">No se detectó patrón de estructuración</p>
+                    <h1 class="font-bold text-base tracking-wide">NaciónPay</h1>
+                    <p class="text-xs text-white/70">Banco de la Nación</p>
                 </div>
-              </div>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-green-700">Transacciones analizadas:</span><span id="af-conteo" class="font-bold text-green-900"></span></div>
-                <div class="flex justify-between"><span class="text-green-700">Monto total:</span><span id="af-monto-total" class="font-bold text-green-900"></span></div>
-                <div class="flex justify-between"><span class="text-green-700">Ventana:</span><span class="font-bold text-green-900">2 horas</span></div>
-              </div>
             </div>
-            <div id="af-card-alerta" class="hidden bg-red-50 border-2 border-red-300 rounded-2xl p-8 alert-card siren">
-              <div class="flex items-center gap-4 mb-4">
-                <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center animate-bounce">
-                  <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div id="status-badge" class="flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-[10px] font-medium text-emerald-400 uppercase tracking-wider">Local API</span>
+            </div>
+        </header>
+
+        <!-- CONTENIDO VISTA PRINCIPAL (SCROLLABLE) -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-5 pb-24 hide-scroll bg-gray-50">
+            
+            <!-- SECCIÓN: REGISTRO -->
+            <section id="view-registro" class="tab-view space-y-5">
+                <div class="text-center pb-2">
+                    <h2 class="text-xl font-extrabold text-slate-800">Crea tu billetera digital</h2>
+                    <p class="text-xs text-slate-500 mt-1">Regístrate en pocos pasos estilo Yape</p>
                 </div>
-                <div>
-                  <h4 class="text-xl font-bold text-red-800">ALERTA LAFT</h4>
-                  <p class="text-sm text-red-600">Patrón de estructuración detectado</p>
+                
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">DNI</label>
+                        <input type="text" id="reg-dni" placeholder="8 dígitos numéricos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Celular</label>
+                        <input type="text" id="reg-celular" placeholder="Inicia con 9, 9 dígitos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nombres</label>
+                        <input type="text" id="reg-nombres" placeholder="Tus nombres" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Apellidos</label>
+                        <input type="text" id="reg-apellidos" placeholder="Tus apellidos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">PIN de Seguridad (6 dígitos)</label>
+                        <input type="password" id="reg-pin" placeholder="••••••" maxlength="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm tracking-widest focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+
+                    <div class="pt-2 space-y-3">
+                        <button onclick="simularHuella()" type="button" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 border border-slate-200 transition-colors">
+                            <i class="fa-solid fa-fingerprint text-base text-bn"></i>
+                            <span id="btn-huella-text">Capturar Huella Biométrica</span>
+                        </button>
+                        <div id="huella-status" class="hidden text-center text-xs font-medium text-emerald-600 bg-emerald-50 py-2 rounded-lg border border-emerald-100">
+                            <i class="fa-solid fa-circle-check mr-1"></i> Huella capturada correctamente
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="bg-red-100 rounded-xl p-4 mb-4">
-                <p class="text-sm text-red-800 font-semibold mb-1">Detalle del Patrón:</p>
-                <p class="text-xs text-red-700">≥15 operaciones con montos > S/ 1,800 en ventana < 2 horas</p>
-              </div>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between"><span class="text-red-700">Transacciones detectadas:</span><span id="af-conteo-alerta" class="font-bold text-red-900 text-lg"></span></div>
-                <div class="flex justify-between"><span class="text-red-700">Monto total acumulado:</span><span id="af-monto-total-alerta" class="font-bold text-red-900 text-lg"></span></div>
-                <div class="flex justify-between"><span class="text-red-700">Umbral de conteo:</span><span class="font-bold text-red-900">15 operaciones</span></div>
-                <div class="flex justify-between"><span class="text-red-700">Umbral de monto:</span><span class="font-bold text-red-900">S/ 1,800</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="bg-white rounded-2xl card-shadow p-6">
-            <h4 class="text-sm font-bold text-gray-700 mb-3">Historial Generado</h4>
-            <div id="af-historial-list" class="space-y-2 max-h-80 overflow-y-auto">
-              <p class="text-sm text-gray-400 text-center py-8">Genere un historial para visualizar</p>
-            </div>
-          </div>
-        </div>
-      </div>
+
+                <button onclick="ejecutarRegistro()" class="w-full bn-guinda hover:bn-guinda-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors tracking-wide">
+                    Crear Billetera
+                </button>
+            </section>
+
+            <!-- SECCIÓN: AUTENTICACIÓN -->
+            <section id="view-autenticacion" class="tab-view hidden space-y-5">
+                <div class="text-center pb-2">
+                    <h2 class="text-xl font-extrabold text-slate-800">Ingresa a tu cuenta</h2>
+                    <p class="text-xs text-slate-500 mt-1">Digita tus accesos autorizados</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">DNI del Usuario</label>
+                        <input type="text" id="auth-dni" placeholder="Ingresa tu DNI" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">PIN de Ingreso</label>
+                        <input type="password" id="auth-pin" placeholder="••••••" maxlength="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm tracking-widest focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                </div>
+                <button onclick="ejecutarLogin()" class="w-full bn-guinda hover:bn-guinda-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors tracking-wide">
+                    Iniciar Sesión
+                </button>
+            </section>
+
+            <!-- SECCIÓN: TRANSFERENCIAS -->
+            <section id="view-transferencias" class="tab-view hidden space-y-5">
+                <div class="text-center pb-2">
+                    <h2 class="text-xl font-extrabold text-slate-800">Enviar Dinero</h2>
+                    <p class="text-xs text-slate-500 mt-1">Transfiere al instante a cualquier cuenta</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Monto (S/.)</label>
+                        <input type="number" id="tx-monto" placeholder="0.00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-semibold text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Celular del Destinatario</label>
+                        <input type="text" id="tx-destino" placeholder="9XXXXXXXX" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Tipo de Transferencia</label>
+                        <select id="tx-tipo" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-red-700 font-medium">
+                            <option value="intrabanco">Mismo Banco (NaciónPay)</option>
+                            <option value="interbanco">Interbancario (CCE)</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="ejecutarTransferencia()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors tracking-wide">
+                    Confirmar Envío
+                </button>
+            </section>
+
+            <!-- SECCIÓN: ANTIFRAUDE -->
+            <section id="view-antifraude" class="tab-view hidden space-y-5">
+                <div class="text-center pb-2">
+                    <h2 class="text-xl font-extrabold text-slate-800">Monitoreo Antifraude</h2>
+                    <p class="text-xs text-slate-500 mt-1">Validación de lavado de activos y alertas LAFT</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4 text-slate-600 text-sm">
+                    <p class="font-semibold text-slate-700">Reglas de Control Activas:</p>
+                    <ul class="space-y-2.5 text-xs text-slate-500">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-shield-halved text-bn mt-0.5"></i>
+                            <span><strong>Estructuración (Pitufeo):</strong> Múltiples operaciones sospechosas fraccionadas para no levantar alertas.</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-shield-halved text-bn mt-0.5"></i>
+                            <span><strong>Umbral LAFT:</strong> Bloqueo inmediato preventivo ante montos inusuales mayores a S/. 10,000.</span>
+                        </li>
+                    </ul>
+                </div>
+                <button onclick="consultarAlertas()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors tracking-wide">
+                    Auditar Alertas LAFT en Vivo
+                </button>
+            </section>
+
+        </main>
+
+        <!-- MENÚ INFERIOR ESTILO NAVEGACIÓN MÓVIL -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-3 flex justify-around items-center shadow-lg shrink-0 z-10">
+            <button onclick="switchTab('registro')" id="nav-registro" class="nav-btn flex flex-col items-center gap-0.5 text-xs font-bold text-bn">
+                <i class="fa-solid fa-user-plus text-base"></i>
+                <span class="text-[10px]">Registro</span>
+            </button>
+            <button onclick="switchTab('autenticacion')" id="nav-autenticacion" class="nav-btn flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400">
+                <i class="fa-solid fa-right-to-bracket text-base"></i>
+                <span class="text-[10px]">Ingreso</span>
+            </button>
+            <button onclick="switchTab('transferencias')" id="nav-transferencias" class="nav-btn flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400">
+                <i class="fa-solid fa-money-bill-transfer text-base"></i>
+                <span class="text-[10px]">Enviar</span>
+            </button>
+            <button onclick="switchTab('antifraude')" id="nav-antifraude" class="nav-btn flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400">
+                <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                <span class="text-[10px]">LAFT</span>
+            </button>
+        </nav>
+
     </div>
-  </main>
-</div>
 
-<script>
-let tokenJWT = null;
-let usuarioActual = null;
-let saldoVisible = { pen: false, usd: false };
-let historialAF = [];
-let biometriaCapturada = false;
+    <!-- LOGICA SCRIPT CORREGIDA PARA CONEXIÓN LOCAL DESDE VERCEL -->
+    <script>
+        // Apuntar directamente a tu localhost donde corre Node.js
+        const API_URL = "http://localhost:3000/api"; 
+        let huellaCapturada = false;
 
-const API_BASE = 'http://localhost:3000/api';
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-bn', 'text-slate-400'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('text-slate-400'));
+            
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.remove('text-slate-400');
+            document.getElementById(`nav-${tabId}`).classList.add('text-bn');
+        }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-  document.getElementById('panel-' + tab).classList.remove('hidden');
-  document.getElementById('panel-' + tab).classList.add('fade-in');
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.remove('bg-white/20', 'text-white');
-    b.classList.add('text-white/70');
-  });
-  const nav = document.getElementById('nav-' + tab);
-  nav.classList.add('bg-white/20', 'text-white');
-  nav.classList.remove('text-white/70');
-}
+        function simularHuella() {
+            huellaCapturada = true;
+            document.getElementById('huella-status').classList.remove('hidden');
+            document.getElementById('btn-huella-text').innerText = "Huella Guardada";
+            Swal.fire({
+                icon: 'success',
+                title: 'Biometría Exitosa',
+                text: 'Se capturó la huella dactilar mediante la simulación de hardware API.',
+                confirmButtonColor: '#73122b',
+                timer: 1500
+            });
+        }
 
-function showToast(mensaje, tipo) {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  const isError = tipo === 'error';
-  const bgClass = isError ? 'bg-red-600' : 'bg-green-600';
-  const icon = isError
-    ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
-    : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-  toast.className = `${bgClass} text-white px-5 py-4 rounded-xl shadow-2xl flex items-center gap-3 pointer-events-auto toast-enter cursor-pointer`;
-  toast.innerHTML = `${icon}<span class="font-medium text-sm">${mensaje}</span>`;
-  toast.onclick = () => { toast.classList.remove('toast-enter'); toast.classList.add('toast-exit'); setTimeout(() => toast.remove(), 300); };
-  container.appendChild(toast);
-  setTimeout(() => { if (toast.parentNode) { toast.classList.remove('toast-enter'); toast.classList.add('toast-exit'); setTimeout(() => toast.remove(), 300); } }, 4000);
-}
+        async function ejecutarRegistro() {
+            const dni = document.getElementById('reg-dni').value;
+            const celular = document.getElementById('reg-celular').value;
+            const nombres = document.getElementById('reg-nombres').value;
+            const apellidos = document.getElementById('reg-apellidos').value;
+            const pin = document.getElementById('reg-pin').value;
 
-function setLoading(btnId, spinnerId, textId, loading) {
-  const btn = document.getElementById(btnId);
-  const spinner = document.getElementById(spinnerId);
-  const text = document.getElementById(textId);
-  if (loading) {
-    spinner.classList.remove('hidden');
-    btn.disabled = true;
-    btn.classList.add('opacity-75', 'cursor-not-allowed');
-  } else {
-    spinner.classList.add('hidden');
-    btn.disabled = false;
-    btn.classList.remove('opacity-75', 'cursor-not-allowed');
-  }
-}
+            if(!dni || !celular || !nombres || !apellidos || !pin) {
+                return Swal.fire({ icon: 'warning', title: 'Campos vacíos', text: 'Por favor, completa todos los campos del formulario.', confirmButtonColor: '#73122b' });
+            }
+            if(!huellaCapturada) {
+                return Swal.fire({ icon: 'info', title: 'Falta Biometría', text: 'Es obligatorio realizar la captura de huella biométrica.', confirmButtonColor: '#73122b' });
+            }
 
-function capturarBiometria() {
-  const btn = document.getElementById('btn-biometria');
-  const text = document.getElementById('text-biometria');
-  const icon = document.getElementById('icon-huella');
-  const status = document.getElementById('biometria-status');
-  btn.disabled = true;
-  text.textContent = 'Capturando...';
-  icon.classList.add('animate-pulse');
-  setTimeout(() => {
-    biometriaCapturada = true;
-    text.textContent = 'Huella Capturada';
-    icon.classList.remove('animate-pulse');
-    status.classList.remove('hidden');
-    status.classList.add('fade-in');
-    showToast('Huella biométrica capturada correctamente', 'success');
-  }, 1500);
-}
+            try {
+                const res = await fetch(`${API_URL}/usuarios/registrar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dni, celular, nombres, apellidos, pin })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    Swal.fire({ icon: 'success', title: '¡Billetera Creada!', text: 'Usuario registrado con éxito en NaciónPay.', confirmButtonColor: '#73122b' });
+                    switchTab('autenticacion');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: data.error || 'No se pudo completar el registro.', confirmButtonColor: '#73122b' });
+                }
+            } catch (err) {
+                manejarErrorConexion();
+            }
+        }
 
-document.getElementById('form-registro').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const dni = document.getElementById('reg-dni').value;
-  const celular = document.getElementById('reg-celular').value;
-  const nombres = document.getElementById('reg-nombres').value.trim();
-  const apellidos = document.getElementById('reg-apellidos').value.trim();
-  const pin = document.getElementById('reg-pin').value;
+        async function ejecutarLogin() {
+            const dni = document.getElementById('auth-dni').value;
+            const pin = document.getElementById('auth-pin').value;
 
-  if (dni.length !== 8) { showToast('El DNI debe tener 8 dígitos', 'error'); return; }
-  if (celular.length !== 9 || celular[0] !== '9') { showToast('El celular debe iniciar con 9 y tener 9 dígitos', 'error'); return; }
-  if (pin.length !== 6) { showToast('El PIN debe tener 6 dígitos', 'error'); return; }
-  if (!nombres || !apellidos) { showToast('Nombres y apellidos son obligatorios', 'error'); return; }
-  if (!biometriaCapturada) { showToast('Debe capturar su huella biométrica', 'error'); return; }
+            try {
+                const res = await fetch(`${API_URL}/usuarios/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dni, pin })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    Swal.fire({ icon: 'success', title: 'Ingreso Correcto', text: `Bienvenido de vuelta, ${data.usuario.nombres}`, confirmButtonColor: '#73122b', timer: 1500 });
+                    switchTab('transferencias');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Fallo de Firma', text: data.error || 'Credenciales incorrectas.', confirmButtonColor: '#73122b' });
+                }
+            } catch (err) {
+                manejarErrorConexion();
+            }
+        }
 
-  setLoading('btn-registro', 'spinner-registro', 'text-registro', true);
-  try {
-    const res = await fetch(`${API_BASE}/registro`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dni, celular, pin, nombres, apellidos, biometria: { huella: 'hash-simulado-' + Date.now() } })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      showToast(`Billetera creada: ${data.billeteraId}`, 'success');
-      document.getElementById('form-registro').reset();
-      biometriaCapturada = false;
-      document.getElementById('biometria-status').classList.add('hidden');
-      document.getElementById('text-biometria').textContent = 'Capturar Huella Biométrica';
-    } else {
-      showToast(data.error || 'Error en el registro', 'error');
-    }
-  } catch (err) {
-    showToast('Error de conexión con el servidor', 'error');
-  }
-  setLoading('btn-registro', 'spinner-registro', 'text-registro', false);
-});
+        async function ejecutarTransferencia() {
+            const monto = document.getElementById('tx-monto').value;
+            const celularDestino = document.getElementById('tx-destino').value;
+            const tipo = document.getElementById('tx-tipo').value;
 
-document.getElementById('form-auth').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const dni = document.getElementById('auth-dni').value;
-  const pin = document.getElementById('auth-pin').value;
-  if (dni.length !== 8 || pin.length !== 6) { showToast('DNI y PIN son obligatorios', 'error'); return; }
+            try {
+                const res = await fetch(`${API_URL}/transferencias/enviar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ monto: parseFloat(monto), celularDestino, tipo })
+                });
+                const data = await res.json();
+                if(res.ok) {
+                    Swal.fire({ icon: 'success', title: '¡Envío Exitoso!', text: `Se transfirieron S/. ${monto} con éxito.`, confirmButtonColor: '#059669' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Operación Rechazada', text: data.error || 'Error al procesar transferencia.', confirmButtonColor: '#73122b' });
+                }
+            } catch (err) {
+                manejarErrorConexion();
+            }
+        }
 
-  setLoading('btn-auth', 'spinner-auth', 'text-auth', true);
-  try {
-    const res = await fetch(`${API_BASE}/auth`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dni, pin })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      tokenJWT = data.token;
-      usuarioActual = data.usuario;
-      document.getElementById('auth-login-form').classList.add('hidden');
-      document.getElementById('auth-dashboard').classList.remove('hidden');
-      document.getElementById('auth-dashboard').classList.add('fade-in');
-      document.getElementById('auth-nombre').textContent = `${data.usuario.nombres} ${data.usuario.apellidos}`;
-      document.getElementById('auth-billetera').textContent = data.usuario.billeteraId;
-      document.getElementById('bloqueo-banner').classList.add('hidden');
-      showToast('Sesión iniciada correctamente', 'success');
-    } else {
-      if (data.codigo === 'CUENTA_BLOQUEADA') {
-        document.getElementById('bloqueo-banner').classList.remove('hidden');
-        document.getElementById('bloqueo-banner').classList.add('shake');
-        document.getElementById('form-auth').classList.add('shake');
-        setTimeout(() => document.getElementById('form-auth').classList.remove('shake'), 500);
-      }
-      showToast(data.error || 'Error de autenticación', 'error');
-    }
-  } catch (err) {
-    showToast('Error de conexión con el servidor', 'error');
-  }
-  setLoading('btn-auth', 'spinner-auth', 'text-auth', false);
-});
+        async function consultarAlertas() {
+            try {
+                const res = await fetch(`${API_URL}/antifraude/alertas`);
+                const data = await res.json();
+                if(res.ok) {
+                    let htmlAlertas = '<div class="space-y-2 text-left text-xs">';
+                    if(data.alertas && data.alertas.length > 0) {
+                        data.alertas.forEach(a => {
+                            htmlAlertas += `<div class="p-2.5 bg-red-50 border border-red-200 rounded-lg text-red-800 font-medium">🚨 [${a.tipo}] - Celular: ${a.celular} - Motivo: ${a.motivo}</div>`;
+                        });
+                    } else {
+                        htmlAlertas += '<div class="text-center text-slate-500 py-4">No se registran alertas de fraude en el bloque actual.</div>';
+                    }
+                    htmlAlertas += '</div>';
+                    Swal.fire({ title: 'Alertas LAFT Detectadas', html: htmlAlertas, confirmButtonColor: '#73122b' });
+                }
+            } catch (err) {
+                manejarErrorConexion();
+            }
+        }
 
-function cerrarSesion() {
-  tokenJWT = null;
-  usuarioActual = null;
-  document.getElementById('auth-dashboard').classList.add('hidden');
-  document.getElementById('auth-login-form').classList.remove('hidden');
-  document.getElementById('form-auth').reset();
-  document.getElementById('bloqueo-banner').classList.add('hidden');
-  showToast('Sesión cerrada', 'success');
-}
-
-function toggleSaldo(moneda) {
-  saldoVisible[moneda] = !saldoVisible[moneda];
-  const el = document.getElementById('saldo-' + moneda);
-  const eye = document.getElementById('eye-' + moneda);
-  if (saldoVisible[moneda]) {
-    el.classList.remove('saldo-blur');
-    eye.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.05 10.05 0 011.574-2.974m2.584-2.584A10.05 10.05 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.574 2.974m-2.584 2.584A10.05 10.05 0 0112 19z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"></path>';
-  } else {
-    el.classList.add('saldo-blur');
-    eye.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
-  }
-}
-
-document.getElementById('form-intra').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const origenId = usuarioActual ? usuarioActual.billeteraId : null;
-  const destinoId = document.getElementById('intra-destino').value.trim();
-  const monto = parseFloat(document.getElementById('intra-monto').value);
-  if (!origenId) { showToast('Debe iniciar sesión primero', 'error'); return; }
-  if (!destinoId) { showToast('Ingrese la billetera destino', 'error'); return; }
-  if (!monto || monto <= 0) { showToast('Ingrese un monto válido', 'error'); return; }
-
-  setLoading('btn-intra', 'spinner-intra', 'text-intra', true);
-  try {
-    const res = await fetch(`${API_BASE}/transferencia/intrabanco`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origenId, destinoId, monto })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      showToast(`Transferencia exitosa: ${data.referencia}`, 'success');
-      document.getElementById('form-intra').reset();
-    } else {
-      showToast(data.error || 'Error en la transferencia', 'error');
-    }
-  } catch (err) {
-    showToast('Error de conexión con el servidor', 'error');
-  }
-  setLoading('btn-intra', 'spinner-intra', 'text-intra', false);
-});
-
-function validarTopeCCE() {
-  const monto = parseFloat(document.getElementById('inter-monto').value) || 0;
-  const moneda = document.getElementById('inter-moneda').value;
-  const warning = document.getElementById('tope-warning');
-  const text = document.getElementById('tope-text');
-  const tope = moneda === 'USD' ? 10000 : 30000;
-  if (monto > tope) {
-    warning.classList.remove('hidden');
-    text.textContent = `Excede el tope de ${moneda === 'USD' ? '$10,000' : 'S/ 30,000'}`;
-    document.getElementById('btn-inter').disabled = true;
-    document.getElementById('btn-inter').classList.add('opacity-50', 'cursor-not-allowed');
-  } else {
-    warning.classList.add('hidden');
-    document.getElementById('btn-inter').disabled = false;
-    document.getElementById('btn-inter').classList.remove('opacity-50', 'cursor-not-allowed');
-  }
-}
-
-document.getElementById('inter-moneda').addEventListener('change', validarTopeCCE);
-
-document.getElementById('form-inter').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const origenId = usuarioActual ? usuarioActual.billeteraId : null;
-  const cci = document.getElementById('inter-cci').value;
-  const monto = parseFloat(document.getElementById('inter-monto').value);
-  const moneda = document.getElementById('inter-moneda').value;
-  if (!origenId) { showToast('Debe iniciar sesión primero', 'error'); return; }
-  if (cci.length !== 20) { showToast('El CCI debe tener 20 dígitos', 'error'); return; }
-  if (!monto || monto <= 0) { showToast('Ingrese un monto válido', 'error'); return; }
-  const tope = moneda === 'USD' ? 10000 : 30000;
-  if (monto > tope) { showToast('Monto excede el tope regulatorio', 'error'); return; }
-
-  setLoading('btn-inter', 'spinner-inter', 'text-inter', true);
-  try {
-    const res = await fetch(`${API_BASE}/transferencia/interbanco`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ origenId, cci, monto, moneda })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      showToast(`Transferencia CCE exitosa: ${data.referenciaCCE}`, 'success');
-      document.getElementById('form-inter').reset();
-      validarTopeCCE();
-    } else {
-      showToast(data.error || 'Error en la transferencia CCE', 'error');
-    }
-  } catch (err) {
-    showToast('Error de conexión con el servidor', 'error');
-  }
-  setLoading('btn-inter', 'spinner-inter', 'text-inter', false);
-});
-
-function generarHistorial() {
-  const cantidad = parseInt(document.getElementById('af-cantidad').value) || 20;
-  const monto = parseFloat(document.getElementById('af-monto').value) || 2000;
-  const intervalo = parseInt(document.getElementById('af-intervalo').value) || 5;
-  const ahora = Date.now();
-  historialAF = [];
-  for (let i = 0; i < cantidad; i++) {
-    historialAF.push({
-      id: `tx-${i}`,
-      monto: monto,
-      timestamp: new Date(ahora - (i * intervalo * 60000)).toISOString()
-    });
-  }
-  const list = document.getElementById('af-historial-list');
-  list.innerHTML = '';
-  historialAF.forEach((tx, idx) => {
-    const div = document.createElement('div');
-    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg text-sm';
-    div.innerHTML = `<span class="font-mono text-gray-600">${tx.id}</span><span class="font-bold text-gray-900">S/ ${tx.monto.toFixed(2)}</span><span class="text-gray-400 text-xs">${new Date(tx.timestamp).toLocaleTimeString()}</span>`;
-    list.appendChild(div);
-  });
-  showToast(`Historial de ${cantidad} transacciones generado`, 'success');
-}
-
-async function verificarAntifraude() {
-  if (historialAF.length === 0) { showToast('Genere un historial primero', 'error'); return; }
-  const nuevaMonto = parseFloat(document.getElementById('af-nueva-monto').value) || 2000;
-  const nuevaTx = {
-    id: 'tx-nueva',
-    monto: nuevaMonto,
-    timestamp: new Date().toISOString()
-  };
-
-  setLoading('btn-af', 'spinner-af', 'text-af', true);
-  try {
-    const res = await fetch(`${API_BASE}/antifraude/verificar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ historial: historialAF, nuevaTx })
-    });
-    const data = await res.json();
-    const resultadoDiv = document.getElementById('af-resultado');
-    const cardNormal = document.getElementById('af-card-normal');
-    const cardAlerta = document.getElementById('af-card-alerta');
-    resultadoDiv.classList.remove('hidden');
-    resultadoDiv.classList.add('fade-in');
-
-    if (data.detectado) {
-      cardNormal.classList.add('hidden');
-      cardAlerta.classList.remove('hidden');
-      cardAlerta.classList.add('fade-in');
-      document.getElementById('af-conteo-alerta').textContent = data.conteo;
-      document.getElementById('af-monto-total-alerta').textContent = 'S/ ' + data.montoTotal.toFixed(2);
-      showToast('ALERTA LAFT: Patrón de estructuración detectado', 'error');
-    } else {
-      cardAlerta.classList.add('hidden');
-      cardNormal.classList.remove('hidden');
-      cardNormal.classList.add('fade-in');
-      document.getElementById('af-conteo').textContent = data.conteo;
-      document.getElementById('af-monto-total').textContent = 'S/ ' + data.montoTotal.toFixed(2);
-      showToast('Operación dentro de parámetros normales', 'success');
-    }
-  } catch (err) {
-    showToast('Error de conexión con el servidor', 'error');
-  }
-  setLoading('btn-af', 'spinner-af', 'text-af', false);
-}
-
-switchTab('registro');
-</script>
+        function manejarErrorConexion() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Sin conexión con la API',
+                text: 'Asegúrate de que tu Backend local esté encendido ejecutando "npm start" en el puerto 3000.',
+                confirmButtonColor: '#73122b'
+            });
+        }
+    </script>
 </body>
 </html>
