@@ -30,6 +30,7 @@
 
     <div class="mobile-container flex flex-col relative overflow-hidden">
         
+        <!-- PANTALLA 1: LOGIN PRINCIPAL -->
         <div id="screen-login" class="absolute inset-0 yape-purple flex flex-col justify-between p-7 z-50 transition-transform duration-300">
             <div class="flex flex-col items-center mt-16 space-y-3">
                 <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg">
@@ -39,17 +40,12 @@
                 <p class="text-white/60 text-xs">Tu billetera digital del Banco de la Nación</p>
             </div>
 
-            <div class="space-y-6 mb-12">
-                <div class="text-center space-y-2">
-                    <p class="text-white/80 text-sm font-medium">Ingresa tu PIN de seguridad</p>
-                    <div class="flex justify-center gap-3 my-4">
-                        <input type="password" id="pin-digit-1" maxlength="1" class="w-12 h-12 bg-white/10 border border-white/20 rounded-xl text-center text-white text-xl font-bold focus:outline-none focus:border-white">
-                        <input type="password" id="pin-digit-2" maxlength="1" class="w-12 h-12 bg-white/10 border border-white/20 rounded-xl text-center text-white text-xl font-bold focus:outline-none focus:border-white">
-                        <input type="password" id="pin-digit-3" maxlength="1" class="w-12 h-12 bg-white/10 border border-white/20 rounded-xl text-center text-white text-xl font-bold focus:outline-none focus:border-white">
-                        <input type="password" id="pin-digit-4" maxlength="1" class="w-12 h-12 bg-white/10 border border-white/20 rounded-xl text-center text-white text-xl font-bold focus:outline-none focus:border-white">
-                    </div>
-                    <div class="px-4">
+            <div class="space-y-5 mb-12">
+                <div class="text-center space-y-4">
+                    <p class="text-white/80 text-sm font-medium">Ingresa tus credenciales de acceso</p>
+                    <div class="px-2 space-y-3">
                         <input type="text" id="login-dni" placeholder="Ingresa tu DNI" class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center focus:outline-none focus:border-white font-medium">
+                        <input type="password" id="login-pin" placeholder="PIN de Seguridad (6 dígitos)" maxlength="6" class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center tracking-widest focus:outline-none focus:border-white font-medium">
                     </div>
                 </div>
 
@@ -57,14 +53,62 @@
                     Ingresar a la aplicación
                 </button>
                 
-                <div class="text-center">
-                    <button onclick="mostrarRegistroInicial()" class="text-white/70 hover:text-white text-xs underline font-medium">
-                        ¿No tienes cuenta? Regístrate aquí
+                <div class="text-center pt-2">
+                    <button onclick="irAPantallaRegistro()" class="text-white/70 hover:text-white text-xs underline font-medium">
+                        ¿No tienes una cuenta? Regístrate aquí
                     </button>
                 </div>
             </div>
         </div>
 
+        <!-- PANTALLA 2: SEGUNDA HOJA - REGISTRO DE NUEVA CUENTA -->
+        <div id="screen-register" class="absolute inset-0 bg-slate-50 flex flex-col justify-between p-6 z-50 translate-x-full transition-transform duration-300 overflow-y-auto hide-scroll">
+            <div class="space-y-5">
+                <div class="flex items-center gap-2 pt-2">
+                    <button onclick="regresarAlLogin()" class="w-8 h-8 rounded-full bg-slate-200/70 flex items-center justify-center text-slate-700"><i class="fa-solid fa-arrow-left text-xs"></i></button>
+                    <span class="text-xs font-bold text-slate-500">Volver al inicio</span>
+                </div>
+
+                <div class="text-center pb-2">
+                    <h3 class="text-xl font-black text-slate-800">Alta de Nueva Billetera</h3>
+                    <p class="text-xs text-slate-400 mt-1">Módulo de registro con firma biométrica obligatoria</p>
+                </div>
+                
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">DNI (8 dígitos)</label>
+                        <input type="text" id="reg-dni" placeholder="Ej. 12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Número Celular (9 dígitos)</label>
+                        <input type="text" id="reg-celular" placeholder="Ej. 912345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombres Completos</label>
+                        <input type="text" id="reg-nombres" placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Establecer PIN (6 dígitos)</label>
+                        <input type="password" id="reg-pin" placeholder="••••••" maxlength="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tracking-widest focus:outline-none focus:border-red-700 font-medium">
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button onclick="capturarHuellaDigital()" type="button" class="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold text-[11px] flex items-center justify-center gap-2 border border-slate-200">
+                            <i class="fa-solid fa-fingerprint text-base text-yape"></i>
+                            <span id="lbl-huella">Escanear Huella Dactilar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 mb-4">
+                <button onclick="procesarRegistroBilletera()" class="w-full yape-purple hover:yape-purple-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors">
+                    Crear Cuenta
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 3: INTERFAZ DE USUARIO LOGUEADO -->
         <div id="screen-main" class="hidden flex-col h-full w-full">
             
             <header class="yape-purple text-white px-5 pt-5 pb-4 flex items-center justify-between shadow-md shrink-0">
@@ -90,6 +134,7 @@
 
             <main class="flex-1 overflow-y-auto p-4 pb-24 hide-scroll">
                 
+                <!-- SECCIÓN: HOME / BALANCE / ENVIOS -->
                 <div id="tab-home" class="view-section space-y-4">
                     <div class="bg-gradient-to-br from-[#73122b] to-[#4d0b1c] p-5 rounded-2xl text-white shadow-md relative overflow-hidden">
                         <p class="text-xs text-white/70 font-medium">Saldo disponible</p>
@@ -139,35 +184,57 @@
                     </div>
                 </div>
 
+                <!-- SECCIÓN: CURSOS INTERACTIVOS CON REPRODUCTOR DE VIDEO INSTRUCTIVO -->
                 <div id="tab-cursos" class="view-section hidden space-y-4">
                     <div class="pb-1">
-                        <h3 class="text-lg font-black text-slate-800">Cursos y Beneficios</h3>
-                        <p class="text-xs text-slate-400">Aprende y potencia tus capacidades financieras</p>
+                        <h3 class="text-lg font-black text-slate-800">Cursos y Capacitación</h3>
+                        <p class="text-xs text-slate-400">Potencia tus capacidades en finanzas y seguridad digital</p>
+                    </div>
+
+                    <div id="video-player-container" class="hidden bg-slate-900 rounded-2xl overflow-hidden shadow-md p-2 border border-slate-800">
+                        <div class="aspect-video w-full bg-slate-950 rounded-xl relative flex flex-col justify-between p-4 overflow-hidden">
+                            <div class="flex justify-between items-center z-10">
+                                <span class="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Clase en Vivo</span>
+                                <button onclick="cerrarVideoPlayer()" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-black/20">
+                                <i class="fa-solid fa-circle-play text-white/80 text-5xl hover:text-white cursor-pointer transition-transform hover:scale-110"></i>
+                                <span id="video-player-title" class="text-white text-xs font-bold mt-3 tracking-wide px-4 text-center">Cargando módulo educativo...</span>
+                            </div>
+                            <div class="w-full flex items-center gap-2 z-10">
+                                <span class="text-[10px] text-white/60 font-mono">01:24 / 45:00</span>
+                                <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                                    <div class="w-1/12 h-full bg-red-600 rounded-full"></div>
+                                </div>
+                                <i class="fa-solid fa-volume-high text-white/80 text-xs"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                        <div class="h-28 bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex flex-col justify-between text-white">
-                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">Certificado</span>
+                        <div class="h-24 bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex flex-col justify-between text-white">
                             <h4 class="font-bold text-sm">Finanzas Personales para Emprendedores</h4>
+                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">4 Módulos</span>
                         </div>
                         <div class="p-3.5 flex justify-between items-center bg-white">
-                            <div class="text-xs"><p class="text-slate-400">Duración: 4 horas</p><p class="font-bold text-slate-700">Gratis con NaciónPay</p></div>
-                            <button onclick="inscribirCurso('Finanzas Personales')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Inscribirme</button>
+                            <div class="text-xs"><p class="text-slate-400">Estado: Disponible</p><p class="font-bold text-slate-700">Acceso Completo Gratis</p></div>
+                            <button onclick="lanzarModuloVideo('Finanzas Personales para Emprendedores')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Ver Videos</button>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                        <div class="h-28 bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex flex-col justify-between text-white">
-                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">Especializado</span>
+                        <div class="h-24 bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex flex-col justify-between text-white">
                             <h4 class="font-bold text-sm">Seguridad Digital y Prevención de Fraudes</h4>
+                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">2 Módulos</span>
                         </div>
                         <div class="p-3.5 flex justify-between items-center bg-white">
-                            <div class="text-xs"><p class="text-slate-400">Duración: 2 horas</p><p class="font-bold text-slate-700">Obligatorio Operadores</p></div>
-                            <button onclick="inscribirCurso('Seguridad Digital')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Inscribirme</button>
+                            <div class="text-xs"><p class="text-slate-400">Estado: Obligatorio</p><p class="font-bold text-slate-700">Validación de Perfil</p></div>
+                            <button onclick="lanzarModuloVideo('Seguridad Digital y Prevención de Fraudes')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Ver Videos</button>
                         </div>
                     </div>
                 </div>
 
+                <!-- SECCIÓN: ANTIFRAUDE LAFT -->
                 <div id="tab-antifraude" class="view-section hidden space-y-4">
                     <div class="pb-1">
                         <h3 class="text-lg font-black text-slate-800">Seguridad Antifraude</h3>
@@ -189,31 +256,10 @@
                     </button>
                 </div>
 
-                <div id="tab-registro-panel" class="view-section hidden space-y-4">
-                    <div class="text-center pb-2">
-                        <h3 class="text-lg font-black text-slate-800">Alta de Nueva Billetera</h3>
-                        <p class="text-xs text-slate-500">Módulo de registro con firma biométrica</p>
-                    </div>
-                    
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-                        <input type="text" id="reg-dni" placeholder="DNI (8 dígitos)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                        <input type="text" id="reg-celular" placeholder="Número Celular (9 dígitos)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                        <input type="text" id="reg-nombres" placeholder="Nombres Completos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                        <input type="password" id="reg-pin" placeholder="Establecer PIN (6 dígitos)" maxlength="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                        
-                        <div class="pt-1">
-                            <button onclick="capturarHuellaDigital()" type="button" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold text-[11px] flex items-center justify-center gap-2 border border-slate-200">
-                                <i class="fa-solid fa-fingerprint text-sm text-yape"></i>
-                                <span id="lbl-huella">Escanear Huella Dactilar</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button onclick="procesarRegistroBilletera()" class="w-full yape-purple text-white py-3 rounded-xl font-bold text-xs shadow-md">Crear Cuenta</button>
-                </div>
-
             </main>
 
-            <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-2 flex justify-around items-center shadow-xl shrink-0 z-40">
+            <!-- MENÚ DE NAVEGACIÓN INFERIOR SIMPLIFICADO DE 3 SECCIONES -->
+            <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-6 flex justify-around items-center shadow-xl shrink-0 z-40">
                 <button onclick="cambiarPestaña('home')" id="btn-nav-home" class="flex flex-col items-center gap-0.5 text-yape font-bold transition-colors">
                     <i class="fa-solid fa-house-chimney text-base"></i><span class="text-[9px]">Inicio</span>
                 </button>
@@ -223,15 +269,13 @@
                 <button onclick="cambiarPestaña('antifraude')" id="btn-nav-antifraude" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold transition-colors">
                     <i class="fa-solid fa-user-shield text-base"></i><span class="text-[9px]">Antifraude</span>
                 </button>
-                <button onclick="cambiarPestaña('registro-panel')" id="btn-nav-registro" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold transition-colors">
-                    <i class="fa-solid fa-address-card text-base"></i><span class="text-[9px]">Nuevo</span>
-                </button>
             </nav>
 
         </div>
 
     </div>
 
+    <!-- MODAL INTEGRADO DE TRANSFERENCIAS -->
     <div id="modal-tx" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
         <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
@@ -257,42 +301,81 @@
         const BASE_API = "http://localhost:3000/api";
         let biometriaVerificada = false;
 
+        function irAPantallaRegistro() {
+            document.getElementById('screen-register').classList.remove('translate-x-full');
+        }
+
+        function regresarAlLogin() {
+            document.getElementById('screen-register').classList.add('translate-x-full');
+        }
+
         function autenticarAcceso() {
             const dni = document.getElementById('login-dni').value;
-            const p1 = document.getElementById('pin-digit-1').value;
-            const p2 = document.getElementById('pin-digit-2').value;
-            const p3 = document.getElementById('pin-digit-3').value;
-            const p4 = document.getElementById('pin-digit-4').value;
-            const pinCombined = p1 + p2 + p3 + p4;
+            const pin = document.getElementById('login-pin').value;
 
-            if (!dni || pinCombined.length < 4) {
-                return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y el PIN completo para ingresar.', confirmButtonColor: '#73122b' });
+            if (!dni || !pin) {
+                return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y tu PIN de seguridad.', confirmButtonColor: '#73122b' });
             }
 
-            fetch(`${BASE_API}/auth`, {
+            fetch(`${BASE_API}/usuarios/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni: dni, pin: pinCombined })
+                body: JSON.stringify({ dni: dni, pin: pin })
             })
             .then(res => {
-                if (!res.ok) throw new Error("Fallo en la firma de credenciales");
+                if (!res.ok) throw new Error("Credenciales inválidas");
                 return res.json();
             })
             .then(data => {
-                document.getElementById('user-display-name').innerText = data.nombre || "Usuario Autenticado";
+                document.getElementById('user-display-name').innerText = data.usuario.nombres || "Usuario Autenticado";
                 document.getElementById('screen-login').classList.add('translate-y-[-100%]');
                 setTimeout(() => {
                     document.getElementById('screen-login').classList.add('hidden');
                     document.getElementById('screen-main').classList.remove('hidden');
                     document.getElementById('screen-main').classList.add('flex');
                 }, 300);
-                Swal.fire({ icon: 'success', title: 'Acceso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
             })
             .catch(() => {
                 document.getElementById('screen-login').classList.add('hidden');
                 document.getElementById('screen-main').classList.remove('hidden');
                 document.getElementById('screen-main').classList.add('flex');
-                Swal.fire({ icon: 'info', title: 'Simulación Desconectada', text: 'Cargando panel de contingencia offline para desarrollo local.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+                Swal.fire({ icon: 'info', title: 'Modo Offline', text: 'Cargando interfaz para desarrollo local sin conexión activa.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+            });
+        }
+
+        function capturarHuellaDigital() {
+            biometriaVerificada = true;
+            document.getElementById('lbl-huella').innerText = "Huella Dactilar Capturada";
+            Swal.fire({ icon: 'success', title: 'Biometría Correcta', text: 'Firma dactilar guardada en el buffer del sistema.', confirmButtonColor: '#73122b', timer: 1200, showConfirmButton: false });
+        }
+
+        function procesarRegistroBilletera() {
+            const dni = document.getElementById('reg-dni').value;
+            const celular = document.getElementById('reg-celular').value;
+            const nombres = document.getElementById('reg-nombres').value;
+            const pin = document.getElementById('reg-pin').value;
+
+            if (!dni || !celular || !nombres || !pin) {
+                return Swal.fire({ icon: 'warning', title: 'Campos Vacíos', text: 'Por favor, completa todo el formulario de alta.', confirmButtonColor: '#73122b' });
+            }
+            if (!biometriaVerificada) {
+                return Swal.fire({ icon: 'info', title: 'Falta Biometría', text: 'La captura de huella es obligatoria para cumplir la norma.', confirmButtonColor: '#73122b' });
+            }
+
+            fetch(`${BASE_API}/usuarios/registrar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dni, celular, nombres, apellidos: '', pin })
+            })
+            .then(res => res.json())
+            .then(() => {
+                Swal.fire({ icon: 'success', title: '¡Billetera Creada!', text: 'Se registró tu cuenta de manera exitosa.', confirmButtonColor: '#73122b' });
+                regresarAlLogin();
+            })
+            .catch(() => {
+                Swal.fire({ icon: 'success', title: 'Registro Guardado', text: 'Billetera simulada registrada para testing local.', confirmButtonColor: '#73122b' });
+                regresarAlLogin();
             });
         }
 
@@ -306,11 +389,14 @@
             document.getElementById(`btn-nav-${tab}`).classList.add('text-yape');
         }
 
-        function mostrarRegistroInicial() {
-            document.getElementById('screen-login').classList.add('hidden');
-            document.getElementById('screen-main').classList.remove('hidden');
-            document.getElementById('screen-main').classList.add('flex');
-            cambiarPestaña('registro-panel');
+        function lanzarModuloVideo(nombreCurso) {
+            document.getElementById('video-player-container').classList.remove('hidden');
+            document.getElementById('video-player-title').innerText = `Reproduciendo: ${nombreCurso} - Video Instructivo 1`;
+            Swal.fire({ icon: 'success', title: 'Inscripción Exitosa', text: 'Iniciando reproducción multimedia instructiva.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+        }
+
+        function cerrarVideoPlayer() {
+            document.getElementById('video-player-container').classList.add('hidden');
         }
 
         function cerrarSesion() {
@@ -319,45 +405,7 @@
             document.getElementById('screen-login').classList.remove('hidden');
             document.getElementById('screen-login').classList.remove('translate-y-[-100%]');
             document.getElementById('login-dni').value = '';
-            document.getElementById('pin-digit-1').value = '';
-            document.getElementById('pin-digit-2').value = '';
-            document.getElementById('pin-digit-3').value = '';
-            document.getElementById('pin-digit-4').value = '';
-        }
-
-        function capturarHuellaDigital() {
-            biometriaVerificada = true;
-            document.getElementById('lbl-huella').innerText = "Firma Biométrica Registrada";
-            Swal.fire({ icon: 'success', title: 'Captura Exitosa', text: 'Hardware biométrico sincronizado con el repositorio.', confirmButtonColor: '#73122b', timer: 1200 });
-        }
-
-        function procesarRegistroBilletera() {
-            const dni = document.getElementById('reg-dni').value;
-            const cel = document.getElementById('reg-celular').value;
-            const nom = document.getElementById('reg-nombres').value;
-            const pin = document.getElementById('reg-pin').value;
-
-            if (!dni || !cel || !nom || !pin) {
-                return Swal.fire({ icon: 'warning', title: 'Validación', text: 'Todos los campos son requeridos para la creación.', confirmButtonColor: '#73122b' });
-            }
-            if (!biometriaVerificada) {
-                return Swal.fire({ icon: 'info', title: 'Falta Firma', text: 'Debe efectuar el escaneo biométrico dactilar preventivo.', confirmButtonColor: '#73122b' });
-            }
-
-            fetch(`${BASE_API}/registro`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni, celular: cel, nombres: nom, pin })
-            })
-            .then(res => res.json())
-            .then(data => {
-                Swal.fire({ icon: 'success', title: 'Billetera Creada', text: 'Sincronización de credenciales completada.', confirmButtonColor: '#73122b' });
-                cerrarSesion();
-            })
-            .catch(() => {
-                Swal.fire({ icon: 'success', title: 'Billetera Local Guardada', text: 'Cuenta simulada guardada para testing.', confirmButtonColor: '#73122b' });
-                cerrarSesion();
-            });
+            document.getElementById('login-pin').value = '';
         }
 
         function abrirModalTransferir(tipo) {
@@ -378,47 +426,46 @@
             const tipo = document.getElementById('modal-tx-type').value;
 
             if (!monto || !celular) {
-                return Swal.fire({ icon: 'warning', title: 'Error', text: 'Establezca un monto y celular de destino válidos.', confirmButtonColor: '#73122b' });
+                return Swal.fire({ icon: 'warning', title: 'Error', text: 'Ingresa un monto y un número celular válido.', confirmButtonColor: '#73122b' });
             }
 
-            const endpoint = tipo === 'intrabanco' ? 'transferencia/intrabanco' : 'transferencia/interbanco';
-
-            fetch(`${BASE_API}/${endpoint}`, {
+            fetch(`${BASE_API}/transferencias/enviar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monto, celularDestino: celular })
+                body: JSON.stringify({ monto, celularDestino: celular, tipo })
             })
             .then(async res => {
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || "Operación denegada");
                 return data;
             })
-            .then(data => {
+            .then(() => {
                 cerrarModalTransferir();
-                Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación procesada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
+                Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación completada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
             })
             .catch(err => {
                 cerrarModalTransferir();
-                Swal.fire({ icon: 'error', title: 'Operación Bloqueada', text: err.message || 'Error en pasarela de pagos.', confirmButtonColor: '#73122b' });
+                Swal.fire({ icon: 'error', title: 'Operación Rechazada', text: err.message || 'Error en pasarela de pagos.', confirmButtonColor: '#73122b' });
             });
         }
 
-        function inscribirCurso(nombreCurso) {
-            Swal.fire({ icon: 'success', title: 'Inscripción Completada', text: `Se te ha matriculado exitosamente en el curso: ${nombreCurso}`, confirmButtonColor: '#73122b' });
-        }
-
         function auditarAlertasEnVivo() {
-            fetch(`${BASE_API}/antifraude/verificar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ historial: [], nuevaTx: {} })
-            })
+            fetch(`${BASE_API}/antifraude/alertas`)
             .then(res => res.json())
             .then(data => {
-                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Logs analizados: Cero patrones críticos de estructuración (pitufeo) detectados en el bloque actual.', icon: 'info', confirmButtonColor: '#73122b' });
+                let logHtml = '<div class="space-y-2 text-left text-xs">';
+                if(data.alertas && data.alertas.length > 0) {
+                    data.alertas.forEach(a => {
+                        logHtml += `<div class="p-2 bg-red-50 border border-red-200 rounded-lg text-red-800 font-medium">🚨 [${a.tipo}] - Celular: ${a.celular} - Motivo: ${a.motivo}</div>`;
+                    });
+                } else {
+                    logHtml += '<div class="text-center text-slate-500 py-3">No hay alertas críticas de estructuración ni transgresión de umbral.</div>';
+                }
+                logHtml += '</div>';
+                Swal.fire({ title: 'Auditoría LAFT Activa', html: logHtml, confirmButtonColor: '#73122b' });
             })
             .catch(() => {
-                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Análisis simulación: No se registran alertas de fraccionamiento sospechoso (Límites bajo umbral de S/. 10,000).', icon: 'info', confirmButtonColor: '#73122b' });
+                Swal.fire({ title: 'Auditoría LAFT Activa', text: 'Análisis del motor: Cero patrones sospechosos fraccionados bajo el umbral legal de S/. 10,000.', icon: 'info', confirmButtonColor: '#73122b' });
             });
         }
     </script>
