@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const { registrarUsuario } = require('./registro');
 const { ejecutarTransferenciaIntrabanco } = require('./transferencia');
 const { procesarTransferenciaInterbanco } = require('./transferenciaCCE');
