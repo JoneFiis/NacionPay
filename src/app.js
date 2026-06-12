@@ -26,7 +26,7 @@ repositorio.usuarios.set('USR-001', {
   dni: '77777777',
   celular: '999888777',
   nombres: 'Jone',
-  pin: '123456',
+  pin: '$2b$10$X7mDlhG6Vz/M9G/UUnZpve9V.E6m23v7O2bJ5hZt3/gZtS2gLXe6e',
   billeteraId: 'WP-777777',
   saldoPEN: 1500.00,
   saldoUSD: 0.00
@@ -37,7 +37,7 @@ repositorio.usuarios.set('USR-002', {
   dni: '88888888',
   celular: '912345678',
   nombres: 'Piero Alva',
-  pin: '654321',
+  pin: '$2b$10$YnZ5pPaeW7S45tK6XmZ2ue5V.E6m23v7O2bJ5hZt3/gZtS2gLXe6e',
   billeteraId: 'WP-888888',
   saldoPEN: 500.00,
   saldoUSD: 0.00
