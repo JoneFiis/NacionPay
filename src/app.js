@@ -8,7 +8,6 @@ const { AntifraudeEngine } = require('./antifraudeEngine');
 
 const app = express();
 
-// CORRECCIÓN CLAVE: Activar la conexión abierta para el Frontend (CORS)
 app.use(cors());
 app.use(express.json());
 
@@ -21,6 +20,28 @@ const repositorio = {
   async guardarTransferencia(tx) { this.transferencias.set(tx.referencia, tx); return true; },
   async guardarTransferenciaCCE(tx) { this.transferenciasCCE.set(tx.referenciaCCE, tx); return true; }
 };
+
+repositorio.usuarios.set('USR-001', {
+  id: 'USR-001',
+  dni: '77777777',
+  celular: '999888777',
+  nombres: 'Jone',
+  pin: '123456',
+  billeteraId: 'WP-777777',
+  saldoPEN: 1500.00,
+  saldoUSD: 0.00
+});
+
+repositorio.usuarios.set('USR-002', {
+  id: 'USR-002',
+  dni: '88888888',
+  celular: '912345678',
+  nombres: 'Piero Alva',
+  pin: '654321',
+  billeteraId: 'WP-888888',
+  saldoPEN: 500.00,
+  saldoUSD: 0.00
+});
 
 const gatewayMock = { async enviar(p) { return { exito: true, codigoRespuesta: '00', referencia: p.referenciaCCE }; } };
 
