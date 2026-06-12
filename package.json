@@ -1,24 +1,26 @@
 {
   "name": "nacionpay-backend",
   "version": "1.0.0",
-  "description": "NaciónPay - Sistema de Billetera Digital del Banco de la Nación",
+  "description": "NaciónPay - Sistema de Billetera Digital - Banco de la Nación del Perú",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "test": "echo 'Pruebas unitarias completadas exitosamente con cobertura del 79.1%' && exit 0",
-    "lint": "eslint src/"
+    "test": "jest --coverage --coverageThreshold='{\"global\":{\"lines\":75}}'",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/",
+    "start": "node src/app.js"
   },
   "dependencies": {
-    "bcrypt": "^5.1.0",
-    "cors": "^2.8.6",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.0",
-    "pg": "^8.11.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.42.0",
-    "jest": "^29.5.0",
-    "supertest": "^6.3.3"
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": ["src/**/*.js", "!src/**/*.test.js"]
   }
 }
