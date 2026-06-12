@@ -3,482 +3,1118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NaciónPay Billetera</title>
+    <title>NaciónPay — Billetera Digital</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: #0f172a;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-        .yape-purple { background-color: #73122b; }
-        .yape-purple-dark { background-color: #540b1e; }
-        .text-yape { color: #73122b; }
-        .mobile-container {
-            max-width: 412px;
-            width: 100%;
-            height: 100vh;
-            background-color: #f8fafc;
-            box-shadow: 0 0 30px rgba(0,0,0,0.6);
-        }
+        body { background-color: #0f172a; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .bn-red  { background-color: #73122b; }
+        .bn-red-dark { background-color: #540b1e; }
+        .text-bn { color: #73122b; }
+        .mobile-container { max-width: 412px; width: 100%; height: 100vh; background-color: #f8fafc; box-shadow: 0 0 30px rgba(0,0,0,0.6); }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen">
 
-    <div class="mobile-container flex flex-col relative overflow-hidden">
-        
-        <div id="screen-login" class="absolute inset-0 yape-purple flex flex-col justify-between p-7 z-50 transition-transform duration-300">
-            <div class="flex flex-col items-center mt-16 space-y-3">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-wallet text-yape text-4xl"></i>
-                </div>
-                <h1 class="text-white font-extrabold text-2xl tracking-wider">NaciónPay</h1>
-                <p class="text-white/60 text-xs">Tu billetera digital del Banco de la Nación</p>
-            </div>
+<div class="mobile-container flex flex-col relative overflow-hidden">
 
-            <div class="space-y-5 mb-12">
-                <div class="text-center space-y-4">
-                    <p class="text-white/80 text-sm font-medium">Ingresa tus credenciales de acceso</p>
-                    <div class="px-2 space-y-3">
-                        <input type="text" id="login-dni" placeholder="Ingresa tu DNI" class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center focus:outline-none focus:border-white font-medium">
-                        <input type="password" id="login-pin" placeholder="PIN de Seguridad (6 dígitos)" maxlength="6" class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center tracking-widest focus:outline-none focus:border-white font-medium">
-                    </div>
-                </div>
-
-                <button onclick="autenticarAcceso()" class="w-full bg-white text-slate-900 py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-slate-50 transition-colors">
-                    Ingresar a la aplicación
-                </button>
-                
-                <div class="text-center pt-2">
-                    <button onclick="irAPantallaRegistro()" class="text-white/70 hover:text-white text-xs underline font-medium">
-                        ¿No tienes una cuenta? Regístrate aquí
-                    </button>
-                </div>
+    <!-- ═══════════════════════════════════════════
+         PANTALLA LOGIN  (RF-002 / HU-AP-05)
+    ═══════════════════════════════════════════ -->
+    <div id="screen-login" class="absolute inset-0 bn-red flex flex-col justify-between p-7 z-50 transition-transform duration-300">
+        <div class="flex flex-col items-center mt-16 space-y-3">
+            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-lg">
+                <i class="fa-solid fa-wallet text-bn text-4xl"></i>
             </div>
+            <h1 class="text-white font-extrabold text-2xl tracking-wider">NaciónPay</h1>
+            <p class="text-white/60 text-xs">Tu billetera digital del Banco de la Nación</p>
         </div>
 
-        <div id="screen-register" class="absolute inset-0 bg-slate-50 flex flex-col justify-between p-6 z-50 translate-x-full transition-transform duration-300 overflow-y-auto hide-scroll">
-            <div class="space-y-5">
-                <div class="flex items-center gap-2 pt-2">
-                    <button onclick="regresarAlLogin()" class="w-8 h-8 rounded-full bg-slate-200/70 flex items-center justify-center text-slate-700"><i class="fa-solid fa-arrow-left text-xs"></i></button>
-                    <span class="text-xs font-bold text-slate-500">Volver al inicio</span>
-                </div>
-
-                <div class="text-center pb-2">
-                    <h3 class="text-xl font-black text-slate-800">Alta de Nueva Billetera</h3>
-                    <p class="text-xs text-slate-400 mt-1">Módulo de registro con firma biométrica obligatoria</p>
-                </div>
-                
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">DNI (8 dígitos)</label>
-                        <input type="text" id="reg-dni" placeholder="Ej. 12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Número Celular (9 dígitos)</label>
-                        <input type="text" id="reg-celular" placeholder="Ej. 912345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombres Completos</label>
-                        <input type="text" id="reg-nombres" placeholder="Nombres y Apellidos" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Establecer PIN (6 dígitos)</label>
-                        <input type="password" id="reg-pin" placeholder="••••••" maxlength="6" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tracking-widest focus:outline-none focus:border-red-700 font-medium">
-                    </div>
-                    
-                    <div class="pt-2">
-                        <button onclick="capturarHuellaDigital()" type="button" class="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold text-[11px] flex items-center justify-center gap-2 border border-slate-200">
-                            <i class="fa-solid fa-fingerprint text-base text-yape"></i>
-                            <span id="lbl-huella">Escanear Huella Dactilar</span>
-                        </button>
-                    </div>
-                </div>
+        <div class="space-y-5 mb-12">
+            <p class="text-white/80 text-sm font-medium text-center">Ingresa tus credenciales de acceso</p>
+            <div class="px-2 space-y-3">
+                <input type="text" id="login-dni" maxlength="8" placeholder="DNI (8 dígitos)"
+                    class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center focus:outline-none focus:border-white font-medium">
+                <input type="password" id="login-pin" maxlength="6" placeholder="PIN de Seguridad (6 dígitos)"
+                    class="w-full bg-white/10 border border-white/20 px-4 py-3 rounded-xl text-white placeholder-white/40 text-sm text-center tracking-widest focus:outline-none focus:border-white font-medium">
             </div>
 
-            <div class="pt-6 mb-4">
-                <button onclick="procesarRegistroBilletera()" class="w-full yape-purple hover:yape-purple-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors">
-                    Crear Cuenta
+            <!-- Indicador de intentos fallidos (RNF-003) -->
+            <div id="login-intentos-aviso" class="hidden text-center">
+                <p id="login-intentos-texto" class="text-yellow-300 text-xs font-bold"></p>
+            </div>
+
+            <button onclick="autenticarAcceso()"
+                class="w-full bg-white text-slate-900 py-3.5 rounded-xl font-bold text-sm shadow-md hover:bg-slate-50 transition-colors">
+                <i class="fa-solid fa-right-to-bracket mr-2"></i>Ingresar a la aplicación
+            </button>
+
+            <!-- Autenticación biométrica simulada (RF-002) -->
+            <button onclick="autenticarBiometria()"
+                class="w-full bg-white/10 border border-white/20 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors">
+                <i class="fa-solid fa-fingerprint text-lg"></i> Acceso Biométrico
+            </button>
+
+            <div class="text-center pt-1">
+                <button onclick="irAPantallaRegistro()" class="text-white/70 hover:text-white text-xs underline font-medium">
+                    ¿No tienes cuenta? Regístrate aquí
                 </button>
             </div>
-        </div>
-
-        <div id="screen-main" class="hidden flex-col h-full w-full">
-            
-            <header class="yape-purple text-white px-5 pt-5 pb-4 flex items-center justify-between shadow-md shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
-                        <i class="fa-solid fa-user text-sm"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] text-white/60">Hola, bienvenido</p>
-                        <h2 id="user-display-name" class="font-bold text-sm">Usuario NaciónPay</h2>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-[9px] font-bold text-emerald-400 uppercase">API OK</span>
-                    </div>
-                    <button onclick="cerrarSesion()" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
-                        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-                    </button>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-y-auto p-4 pb-24 hide-scroll">
-                
-                <div id="tab-home" class="view-section space-y-4">
-                    <div class="bg-gradient-to-br from-[#73122b] to-[#4d0b1c] p-5 rounded-2xl text-white shadow-md relative overflow-hidden">
-                        <p class="text-xs text-white/70 font-medium">Saldo disponible</p>
-                        <div class="flex items-baseline gap-1 mt-1">
-                            <span class="text-lg font-bold text-white/90">S/.</span>
-                            <span id="wallet-balance" class="text-3xl font-black tracking-tight">1,450.00</span>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/10 flex justify-between text-xs text-white/80">
-                            <span>Billetera ID: <strong id="wallet-id">WP-777777</strong></span>
-                            <i class="fa-solid fa-eye-slash cursor-pointer"></i>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="abrirModalTransferir('intrabanco')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center gap-2 hover:bg-slate-50 transition-colors">
-                            <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-yape">
-                                <i class="fa-solid fa-bolt text-lg"></i>
-                            </div>
-                            <span class="text-xs font-bold text-slate-800">Transferencia Directa</span>
-                        </button>
-                        <button onclick="abrirModalTransferir('interbanco')" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center gap-2 hover:bg-slate-50 transition-colors">
-                            <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
-                                <i class="fa-solid fa-money-bill-transfer text-lg"></i>
-                            </div>
-                            <span class="text-xs font-bold text-slate-800">Interbancario CCE</span>
-                        </button>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider mb-3">Últimos movimientos</h3>
-                        <div id="transactions-list" class="space-y-3">
-                            <div class="flex items-center justify-between text-sm pb-1 border-b border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fa-solid fa-arrow-down"></i></div>
-                                    <div><p class="font-bold text-slate-800 text-xs">Piero Alva</p><p class="text-[10px] text-slate-400">Hoy 11:15 AM</p></div>
-                                </div>
-                                <span class="font-bold text-emerald-600 text-xs">+ S/. 45.00</span>
-                            </div>
-                            <div class="flex items-center justify-between text-sm pb-1 border-b border-slate-100">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs"><i class="fa-solid fa-arrow-up"></i></div>
-                                    <div><p class="font-bold text-slate-800 text-xs">KFC Centro Cívico</p><p class="text-[10px] text-slate-400">Ayer 08:30 PM</p></div>
-                                </div>
-                                <span class="font-bold text-slate-800 text-xs">- S/. 28.90</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-cursos" class="view-section hidden space-y-4">
-                    <div class="pb-1">
-                        <h3 class="text-lg font-black text-slate-800">Cursos y Capacitación</h3>
-                        <p class="text-xs text-slate-400">Potencia tus capacidades en finanzas y seguridad digital</p>
-                    </div>
-
-                    <div id="video-player-container" class="hidden bg-slate-900 rounded-2xl overflow-hidden shadow-md p-2 border border-slate-800">
-                        <div class="aspect-video w-full bg-slate-950 rounded-xl relative flex flex-col justify-between p-4 overflow-hidden">
-                            <div class="flex justify-between items-center z-10">
-                                <span class="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">Clase en Vivo</span>
-                                <button onclick="cerrarVideoPlayer()" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-black/20">
-                                <i class="fa-solid fa-circle-play text-white/80 text-5xl hover:text-white cursor-pointer transition-transform hover:scale-110"></i>
-                                <span id="video-player-title" class="text-white text-xs font-bold mt-3 tracking-wide px-4 text-center">Cargando módulo educativo...</span>
-                            </div>
-                            <div class="w-full flex items-center gap-2 z-10">
-                                <span class="text-[10px] text-white/60 font-mono">01:24 / 45:00</span>
-                                <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
-                                    <div class="w-1/12 h-full bg-red-600 rounded-full"></div>
-                                </div>
-                                <i class="fa-solid fa-volume-high text-white/80 text-xs"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                        <div class="h-24 bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex flex-col justify-between text-white">
-                            <h4 class="font-bold text-sm">Finanzas Personales para Emprendedores</h4>
-                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">4 Módulos</span>
-                        </div>
-                        <div class="p-3.5 flex justify-between items-center bg-white">
-                            <div class="text-xs"><p class="text-slate-400">Estado: Disponible</p><p class="font-bold text-slate-700">Acceso Completo Gratis</p></div>
-                            <button onclick="lanzarModuloVideo('Finanzas Personales para Emprendedores')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Ver Videos</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                        <div class="h-24 bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex flex-col justify-between text-white">
-                            <h4 class="font-bold text-sm">Seguridad Digital y Prevención de Fraudes</h4>
-                            <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">2 Módulos</span>
-                        </div>
-                        <div class="p-3.5 flex justify-between items-center bg-white">
-                            <div class="text-xs"><p class="text-slate-400">Estado: Obligatorio</p><p class="font-bold text-slate-700">Validación de Perfil</p></div>
-                            <button onclick="lanzarModuloVideo('Seguridad Digital y Prevención de Fraudes')" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">Ver Videos</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="tab-antifraude" class="view-section hidden space-y-4">
-                    <div class="pb-1">
-                        <h3 class="text-lg font-black text-slate-800">Seguridad Antifraude</h3>
-                        <p class="text-xs text-slate-400">Monitoreo transaccional de lavado de activos en tiempo real</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
-                        <div class="flex items-center gap-2 text-amber-600"><i class="fa-solid fa-shield-halved text-lg"></i><h4 class="font-bold text-xs uppercase tracking-wider">Regla 1: Control de Estructuración</h4></div>
-                        <p class="text-xs text-slate-500 leading-relaxed">El motor analiza patrones de fraccionamiento u operaciones consecutivas (Pitufeo) diseñadas para evadir controles obligatorios del sistema financiero.</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
-                        <div class="flex items-center gap-2 text-red-600"><i class="fa-solid fa-triangle-exclamation text-lg"></i><h4 class="font-bold text-xs uppercase tracking-wider">Regla 2: Umbral Normativo LAFT</h4></div>
-                        <p class="text-xs text-slate-500 leading-relaxed">Cualquier operación única o acumulada que supere el límite establecido de S/. 10,000 en el periodo de control gatilla una alerta de bloqueo preventivo inmediato de fondos.</p>
-                    </div>
-
-                    <button onclick="auditarAlertasEnVivo()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">
-                        <i class="fa-solid fa-chart-line"></i> Auditar Logs de Cumplimiento LAFT
-                    </button>
-                </div>
-
-            </main>
-
-            <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-6 flex justify-around items-center shadow-xl shrink-0 z-40">
-                <button onclick="cambiarPestaña('home')" id="btn-nav-home" class="flex flex-col items-center gap-0.5 text-yape font-bold transition-colors">
-                    <i class="fa-solid fa-house-chimney text-base"></i><span class="text-[9px]">Inicio</span>
-                </button>
-                <button onclick="cambiarPestaña('cursos')" id="btn-nav-cursos" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold transition-colors">
-                    <i class="fa-solid fa-graduation-cap text-base"></i><span class="text-[9px]">Cursos</span>
-                </button>
-                <button onclick="cambiarPestaña('antifraude')" id="btn-nav-antifraude" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold transition-colors">
-                    <i class="fa-solid fa-user-shield text-base"></i><span class="text-[9px]">Antifraude</span>
-                </button>
-            </nav>
-
-        </div>
-
-    </div>
-
-    <div id="modal-tx" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
-        <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                <h4 id="modal-tx-title" class="font-extrabold text-slate-800 text-sm">Enviar Dinero</h4>
-                <button onclick="cerrarModalTransferir()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <input type="hidden" id="modal-tx-type">
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Monto a enviar (S/.)</label>
-                    <input type="number" id="modal-tx-amount" placeholder="0.00" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Celular Destino</label>
-                    <input type="text" id="modal-tx-phone" placeholder="9XXXXXXXX" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
-                </div>
-            </div>
-            <button onclick="procesarEnvioDinero()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs shadow-md hover:bg-emerald-700 transition-colors">Ejecutar Operación</button>
         </div>
     </div>
 
-    <script>
-        const BASE_API = "http://127.0.0.1:5000/api";
-        let biometriaVerificada = false;
+    <!-- ═══════════════════════════════════════════
+         PANTALLA REGISTRO  (RF-001 / HU-REG-01)
+    ═══════════════════════════════════════════ -->
+    <div id="screen-register" class="absolute inset-0 bg-slate-50 flex flex-col justify-between p-6 z-50 translate-x-full transition-transform duration-300 overflow-y-auto hide-scroll">
+        <div class="space-y-5">
+            <div class="flex items-center gap-2 pt-2">
+                <button onclick="regresarAlLogin()" class="w-8 h-8 rounded-full bg-slate-200/70 flex items-center justify-center text-slate-700">
+                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                </button>
+                <span class="text-xs font-bold text-slate-500">Volver al inicio</span>
+            </div>
 
-        function irAPantallaRegistro() {
-            document.getElementById('screen-register').classList.remove('translate-x-full');
-        }
+            <div class="text-center pb-2">
+                <h3 class="text-xl font-black text-slate-800">Alta de Nueva Billetera</h3>
+                <p class="text-xs text-slate-400 mt-1">Registro con validación KYC y biometría obligatoria (SBS)</p>
+            </div>
 
-        function regresarAlLogin() {
-            document.getElementById('screen-register').classList.add('translate-x-full');
-        }
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">DNI (8 dígitos exactos)</label>
+                    <input type="text" id="reg-dni" maxlength="8" placeholder="Ej. 45678901"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Celular (comienza con 9)</label>
+                    <input type="text" id="reg-celular" maxlength="9" placeholder="Ej. 912345678"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombres</label>
+                    <input type="text" id="reg-nombres" placeholder="Nombres"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Apellidos</label>
+                    <input type="text" id="reg-apellidos" placeholder="Apellidos"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-red-700 font-medium">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">PIN (6 dígitos)</label>
+                    <input type="password" id="reg-pin" maxlength="6" placeholder="••••••"
+                        class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs tracking-widest focus:outline-none focus:border-red-700 font-medium">
+                </div>
 
-        function autenticarAcceso() {
-            const dniInput = document.getElementById('login-dni').value;
-            const pinInput = document.getElementById('login-pin').value;
+                <!-- Biometría simulada (RF-001) -->
+                <div class="pt-1">
+                    <button onclick="capturarHuellaDigital()" type="button"
+                        class="w-full bg-slate-100 text-slate-700 py-3 rounded-xl font-bold text-[11px] flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-200 transition-colors">
+                        <i class="fa-solid fa-fingerprint text-base text-bn"></i>
+                        <span id="lbl-huella">Escanear Huella Dactilar</span>
+                    </button>
+                </div>
 
-            if (!dniInput || !pinInput) {
-                return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y tu PIN de seguridad.', confirmButtonColor: '#73122b' });
+                <!-- Consentimiento LOPD (RNF-012 / Ley 29733) -->
+                <div class="flex items-start gap-2 pt-1">
+                    <input type="checkbox" id="reg-consentimiento" class="mt-0.5 accent-red-700">
+                    <label for="reg-consentimiento" class="text-[10px] text-slate-500 leading-relaxed">
+                        Acepto los <span class="text-bn font-bold underline cursor-pointer">Términos de Uso</span> y la
+                        <span class="text-bn font-bold underline cursor-pointer">Política de Privacidad</span> conforme a la Ley 29733.
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-6 mb-4">
+            <button onclick="procesarRegistroBilletera()"
+                class="w-full bn-red hover:bn-red-dark text-white py-3.5 rounded-xl font-bold text-sm shadow-md transition-colors">
+                <i class="fa-solid fa-user-plus mr-2"></i>Crear Cuenta NaciónPay
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         PANTALLA PRINCIPAL
+    ═══════════════════════════════════════════ -->
+    <div id="screen-main" class="hidden flex-col h-full w-full">
+
+        <!-- Header -->
+        <header class="bn-red text-white px-5 pt-5 pb-4 flex items-center justify-between shadow-md shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center border border-white/20">
+                    <i class="fa-solid fa-user text-sm"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] text-white/60">Bienvenido/a</p>
+                    <h2 id="user-display-name" class="font-bold text-sm">Usuario NaciónPay</h2>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[9px] font-bold text-emerald-400 uppercase">API OK</span>
+                </div>
+                <!-- Temporizador de sesión (RNF-003) -->
+                <div id="session-timer-badge" class="bg-yellow-500/20 border border-yellow-500/30 px-2 py-0.5 rounded-full hidden">
+                    <span id="session-timer-text" class="text-[9px] font-bold text-yellow-300">5:00</span>
+                </div>
+                <button onclick="cerrarSesion()" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 pb-24 hide-scroll">
+
+            <!-- ── TAB HOME ── -->
+            <div id="tab-home" class="view-section space-y-4">
+
+                <!-- Tarjeta saldo (RF-004) -->
+                <div class="bg-gradient-to-br from-[#73122b] to-[#4d0b1c] p-5 rounded-2xl text-white shadow-md relative overflow-hidden">
+                    <p class="text-xs text-white/70 font-medium">Saldo disponible</p>
+                    <div class="flex items-baseline gap-1 mt-1">
+                        <span class="text-lg font-bold text-white/90">S/.</span>
+                        <span id="wallet-balance" class="text-3xl font-black tracking-tight">0.00</span>
+                        <button onclick="toggleSaldo()" class="ml-2 text-white/60 hover:text-white">
+                            <i id="icon-eye" class="fa-solid fa-eye-slash text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-white/10 flex justify-between text-xs text-white/80">
+                        <span>ID: <strong id="wallet-id">—</strong></span>
+                        <span id="wallet-moneda" class="text-white/50 text-[9px]">PEN</span>
+                    </div>
+                </div>
+
+                <!-- Acciones rápidas -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="abrirModalTransferir('intrabanco')"
+                        class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center gap-2 hover:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-bn">
+                            <i class="fa-solid fa-bolt text-lg"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-800">Transferencia Directa</span>
+                        <span class="text-[9px] text-slate-400">Intrabanco NaciónPay</span>
+                    </button>
+                    <button onclick="abrirModalTransferir('interbanco')"
+                        class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center gap-2 hover:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+                            <i class="fa-solid fa-money-bill-transfer text-lg"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-800">Interbancario CCE</span>
+                        <span class="text-[9px] text-slate-400">Tope S/ 30,000</span>
+                    </button>
+                    <button onclick="abrirModalQR()"
+                        class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center gap-2 hover:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600">
+                            <i class="fa-solid fa-qrcode text-lg"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-800">Pago QR</span>
+                        <span class="text-[9px] text-slate-400">Comercios afiliados</span>
+                    </button>
+                    <button onclick="abrirModalServicios()"
+                        class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center gap-2 hover:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-600">
+                            <i class="fa-solid fa-file-invoice-dollar text-lg"></i>
+                        </div>
+                        <span class="text-xs font-bold text-slate-800">Pagar Servicio</span>
+                        <span class="text-[9px] text-slate-400">Agua, luz, telefonía</span>
+                    </button>
+                </div>
+
+                <!-- Movimientos (RF-004) -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Últimos movimientos</h3>
+                        <span class="text-[9px] text-slate-400">Últimos 90 días</span>
+                    </div>
+                    <div id="transactions-list" class="space-y-3">
+                        <p class="text-xs text-slate-400 text-center py-4">No hay movimientos registrados aún.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TAB CURSOS (RF-010 / HU-ICF-09) ── -->
+            <div id="tab-cursos" class="view-section hidden space-y-4">
+                <div class="pb-1">
+                    <h3 class="text-lg font-black text-slate-800">Cursos y Capacitación</h3>
+                    <p class="text-xs text-slate-400">Potencia tus capacidades en finanzas y seguridad digital</p>
+                </div>
+
+                <div id="video-player-container" class="hidden bg-slate-900 rounded-2xl overflow-hidden shadow-md p-2 border border-slate-800">
+                    <div class="aspect-video w-full bg-slate-950 rounded-xl relative flex flex-col justify-between p-4">
+                        <div class="flex justify-between items-center z-10">
+                            <span class="bg-red-600 text-white font-bold text-[9px] px-2 py-0.5 rounded-full uppercase animate-pulse">Clase en Vivo</span>
+                            <button onclick="cerrarVideoPlayer()" class="text-white/60 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-black/20">
+                            <i class="fa-solid fa-circle-play text-white/80 text-5xl hover:text-white cursor-pointer transition-transform hover:scale-110"></i>
+                            <span id="video-player-title" class="text-white text-xs font-bold mt-3 tracking-wide px-4 text-center">Cargando módulo educativo...</span>
+                        </div>
+                        <div class="w-full flex items-center gap-2 z-10">
+                            <span class="text-[10px] text-white/60 font-mono">00:00 / 45:00</span>
+                            <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="w-0 h-full bg-red-600 rounded-full transition-all duration-300"></div>
+                            </div>
+                            <i class="fa-solid fa-volume-high text-white/80 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Curso 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100" id="curso-finanzas">
+                    <div class="h-24 bg-gradient-to-r from-amber-500 to-orange-600 p-4 flex flex-col justify-between text-white">
+                        <h4 class="font-bold text-sm">Finanzas Personales para Emprendedores</h4>
+                        <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">4 Módulos · Básico</span>
+                    </div>
+                    <div class="p-3.5">
+                        <div id="progreso-finanzas" class="mb-2 hidden">
+                            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                                <span>Progreso</span><span id="pct-finanzas">0%</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 rounded-full"><div id="bar-finanzas" class="h-full bg-amber-500 rounded-full transition-all" style="width:0%"></div></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs"><p class="text-slate-400">Disponible · Gratis</p></div>
+                            <button onclick="inscribirseEnCurso('finanzas','Finanzas Personales para Emprendedores')"
+                                id="btn-finanzas" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">
+                                Inscribirme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Curso 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100" id="curso-seguridad">
+                    <div class="h-24 bg-gradient-to-r from-blue-600 to-indigo-700 p-4 flex flex-col justify-between text-white">
+                        <h4 class="font-bold text-sm">Seguridad Digital y Prevención de Fraudes</h4>
+                        <span class="bg-white/20 text-[9px] uppercase font-bold px-2 py-0.5 rounded-full w-max">2 Módulos · Obligatorio</span>
+                    </div>
+                    <div class="p-3.5">
+                        <div id="progreso-seguridad" class="mb-2 hidden">
+                            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                                <span>Progreso</span><span id="pct-seguridad">0%</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 rounded-full"><div id="bar-seguridad" class="h-full bg-blue-600 rounded-full transition-all" style="width:0%"></div></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="text-xs"><p class="text-slate-400">Obligatorio · Validación de perfil</p></div>
+                            <button onclick="inscribirseEnCurso('seguridad','Seguridad Digital y Prevención de Fraudes')"
+                                id="btn-seguridad" class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-800">
+                                Inscribirme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── TAB ANTIFRAUDE (RF-013 / HU-ADM-03) ── -->
+            <div id="tab-antifraude" class="view-section hidden space-y-4">
+                <div class="pb-1">
+                    <h3 class="text-lg font-black text-slate-800">Seguridad Antifraude LAFT</h3>
+                    <p class="text-xs text-slate-400">Monitoreo transaccional en tiempo real · BCRP/SBS</p>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 text-amber-600">
+                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                        <h4 class="font-bold text-xs uppercase tracking-wider">Regla 1 — Control de Estructuración</h4>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        El motor detecta ≥ 15 operaciones de monto similar (> S/ 1,800) en una ventana de 2 horas,
+                        patrón conocido como "pitufeo". Se bloquea la cuenta preventivamente y se notifica al equipo de cumplimiento.
+                    </p>
+                    <div class="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg">
+                        <i class="fa-solid fa-circle-info text-blue-500"></i>
+                        <span>Umbral: 15 transacciones · Ventana: 2 horas · Monto mínimo: S/ 1,800</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
+                    <div class="flex items-center gap-2 text-red-600">
+                        <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                        <h4 class="font-bold text-xs uppercase tracking-wider">Regla 2 — Tope CCE Regulatorio</h4>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Transferencias interbancarias superiores a S/ 30,000 o US$ 10,000 son rechazadas
+                        automáticamente conforme al esquema CCE del BCRP (RF-006).
+                    </p>
+                </div>
+
+                <!-- Simulador LAFT -->
+                <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm space-y-3">
+                    <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider">Simulador de Patrón LAFT</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">N° Transacciones</label>
+                            <input type="number" id="sim-count" value="16" min="1" max="30"
+                                class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Monto c/u (S/)</label>
+                            <input type="number" id="sim-monto" value="1900" min="1"
+                                class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 focus:outline-none">
+                        </div>
+                    </div>
+                    <button onclick="simularPatronLAFT()"
+                        class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors">
+                        <i class="fa-solid fa-chart-line"></i> Ejecutar Motor Antifraude
+                    </button>
+                    <div id="sim-resultado" class="hidden text-xs p-3 rounded-lg font-medium"></div>
+                </div>
+            </div>
+
+            <!-- ── TAB RECLAMOS (RF-011 / RF-012 / HU-RCL-04) ── -->
+            <div id="tab-reclamos" class="view-section hidden space-y-4">
+                <div class="pb-1">
+                    <h3 class="text-lg font-black text-slate-800">Chatbot & Reclamos</h3>
+                    <p class="text-xs text-slate-400">Asistencia automática 24/7 con derivación a operador</p>
+                </div>
+
+                <!-- Chatbot (RF-011) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="bn-red px-4 py-3 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-white text-sm"></i>
+                        <span class="text-white font-bold text-xs">Asistente NaciónPay</span>
+                        <span class="ml-auto text-[9px] text-white/60">Responde en ≤ 2s</span>
+                    </div>
+                    <div id="chat-messages" class="p-3 space-y-2 min-h-[120px] max-h-[180px] overflow-y-auto hide-scroll">
+                        <div class="flex gap-2">
+                            <div class="w-6 h-6 bn-red rounded-full flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-robot text-white text-[9px]"></i>
+                            </div>
+                            <div class="bg-slate-100 px-3 py-2 rounded-xl rounded-tl-none text-xs text-slate-700 max-w-[80%]">
+                                ¡Hola! Soy tu asistente NaciónPay. ¿En qué puedo ayudarte hoy?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 border-t border-slate-100 flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Escribe tu consulta..."
+                            class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none"
+                            onkeydown="if(event.key==='Enter') enviarMensajeChatbot()">
+                        <button onclick="enviarMensajeChatbot()"
+                            class="bn-red text-white px-3 py-2 rounded-xl text-xs font-bold hover:bn-red-dark transition-colors">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulario de reclamo (RF-012) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
+                    <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider">
+                        <i class="fa-solid fa-file-circle-exclamation text-bn mr-1"></i>Registrar Reclamo
+                    </h4>
+                    <textarea id="reclamo-motivo" rows="3" placeholder="Describe el problema (mín. 10 caracteres)..."
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none resize-none"></textarea>
+                    <input type="text" id="reclamo-operacion" placeholder="Número de operación (opcional)"
+                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none">
+                    <button onclick="registrarReclamo()"
+                        class="w-full bn-red text-white py-2.5 rounded-xl font-bold text-xs hover:bn-red-dark transition-colors">
+                        <i class="fa-solid fa-ticket mr-1"></i>Generar Ticket de Reclamo
+                    </button>
+                </div>
+
+                <!-- Mis tickets -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+                    <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-3">Mis Tickets</h4>
+                    <div id="tickets-list">
+                        <p class="text-xs text-slate-400 text-center py-2">No hay tickets registrados.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Nav bar -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 px-4 flex justify-around items-center shadow-xl shrink-0 z-40">
+            <button onclick="cambiarPestaña('home')" id="btn-nav-home" class="flex flex-col items-center gap-0.5 text-bn font-bold">
+                <i class="fa-solid fa-house-chimney text-base"></i><span class="text-[9px]">Inicio</span>
+            </button>
+            <button onclick="cambiarPestaña('cursos')" id="btn-nav-cursos" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold">
+                <i class="fa-solid fa-graduation-cap text-base"></i><span class="text-[9px]">Cursos</span>
+            </button>
+            <button onclick="cambiarPestaña('antifraude')" id="btn-nav-antifraude" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold">
+                <i class="fa-solid fa-user-shield text-base"></i><span class="text-[9px]">Antifraude</span>
+            </button>
+            <button onclick="cambiarPestaña('reclamos')" id="btn-nav-reclamos" class="flex flex-col items-center gap-0.5 text-slate-400 font-bold">
+                <i class="fa-solid fa-headset text-base"></i><span class="text-[9px]">Ayuda</span>
+            </button>
+        </nav>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL TRANSFERENCIA (RF-005 / RF-006)
+═══════════════════════════════════════════ -->
+<div id="modal-tx" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+    <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h4 id="modal-tx-title" class="font-extrabold text-slate-800 text-sm">Enviar Dinero</h4>
+            <button onclick="cerrarModalTransferir()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <input type="hidden" id="modal-tx-type">
+        <div class="space-y-3">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Monto (S/.)</label>
+                <input type="number" id="modal-tx-amount" placeholder="0.00" min="0.01" step="0.01"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none">
+            </div>
+            <!-- intrabanco: celular / interbanco: CCI -->
+            <div id="campo-celular-wrap">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Celular Destino (NaciónPay)</label>
+                <input type="text" id="modal-tx-phone" maxlength="9" placeholder="9XXXXXXXX"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+            </div>
+            <div id="campo-cci-wrap" class="hidden">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CCI Destino (20 dígitos)</label>
+                <input type="text" id="modal-tx-cci" maxlength="20" placeholder="00219300XXXXXXXXXXXX"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+                <p class="text-[9px] text-slate-400 mt-1">Tope regulatorio: S/ 30,000 por operación (CCE)</p>
+            </div>
+        </div>
+        <button onclick="procesarEnvioDinero()"
+            class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs shadow-md hover:bg-emerald-700 transition-colors">
+            <i class="fa-solid fa-paper-plane mr-1"></i>Ejecutar Operación
+        </button>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL PAGO QR  (RF-007)
+═══════════════════════════════════════════ -->
+<div id="modal-qr" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+    <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h4 class="font-extrabold text-slate-800 text-sm"><i class="fa-solid fa-qrcode mr-1 text-bn"></i>Pago QR</h4>
+            <button onclick="cerrarModalQR()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <p class="text-xs text-slate-500">Simulación de escaneo QR de comercio afiliado (vigencia: 5 min)</p>
+        <div class="flex flex-col items-center gap-3 py-2">
+            <div class="w-32 h-32 bg-slate-100 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300">
+                <i class="fa-solid fa-qrcode text-5xl text-slate-400"></i>
+            </div>
+            <button onclick="simularEscaneoQR()" class="text-xs font-bold text-bn underline">Simular escaneo de QR</button>
+        </div>
+        <div id="qr-monto-wrap" class="hidden space-y-2">
+            <p class="text-xs text-slate-600">Comercio: <strong id="qr-comercio-nombre">Comercio Afiliado</strong></p>
+            <p class="text-xs text-slate-600">Monto: <strong id="qr-monto-valor">S/ 0.00</strong></p>
+            <button onclick="confirmarPagoQR()"
+                class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs hover:bg-emerald-700 transition-colors">
+                Confirmar Pago
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL PAGO SERVICIOS  (RF-008)
+═══════════════════════════════════════════ -->
+<div id="modal-servicios" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+    <div class="bg-white w-full max-w-[360px] rounded-2xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h4 class="font-extrabold text-slate-800 text-sm"><i class="fa-solid fa-file-invoice-dollar mr-1 text-bn"></i>Pago de Servicios</h4>
+            <button onclick="cerrarModalServicios()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-3">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tipo de Servicio</label>
+                <select id="srv-tipo" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+                    <option value="luz">Luz (Enel / Luz del Sur)</option>
+                    <option value="agua">Agua (Sedapal)</option>
+                    <option value="gas">Gas (Cálidda)</option>
+                    <option value="telefonia">Telefonía</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Código de Suministro</label>
+                <input type="text" id="srv-codigo" placeholder="Ej. 12345678"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none">
+            </div>
+            <button onclick="consultarDeudaServicio()"
+                class="w-full bg-orange-500 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-orange-600 transition-colors">
+                <i class="fa-solid fa-magnifying-glass mr-1"></i>Consultar Deuda
+            </button>
+            <div id="srv-deuda-wrap" class="hidden p-3 bg-slate-50 rounded-xl space-y-2">
+                <p class="text-xs text-slate-600">Monto a pagar: <strong id="srv-monto-deuda" class="text-slate-900">S/ 0.00</strong></p>
+                <button onclick="confirmarPagoServicio()"
+                    class="w-full bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-700 transition-colors">
+                    <i class="fa-solid fa-check mr-1"></i>Confirmar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ─────────────────────────────────────────────
+    //  CONFIGURACIÓN
+    // ─────────────────────────────────────────────
+    const BASE_API = "http://127.0.0.1:5000/api";
+    let biometriaVerificada = false;
+    let saldoVisible = true;
+    let saldoReal = 0;
+    let sessionTimerInterval = null;
+    let sessionSecondsLeft = 300; // 5 min (RNF-003)
+    const inscripciones = {};     // estado local de cursos
+    const tickets = [];           // tickets de reclamos
+
+    // ─────────────────────────────────────────────
+    //  NAVEGACIÓN
+    // ─────────────────────────────────────────────
+    function irAPantallaRegistro() {
+        document.getElementById('screen-register').classList.remove('translate-x-full');
+    }
+    function regresarAlLogin() {
+        document.getElementById('screen-register').classList.add('translate-x-full');
+        biometriaVerificada = false;
+        document.getElementById('lbl-huella').innerText = 'Escanear Huella Dactilar';
+    }
+    function cambiarPestaña(tab) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('nav button').forEach(el => {
+            el.classList.remove('text-bn');
+            el.classList.add('text-slate-400');
+        });
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        document.getElementById(`btn-nav-${tab}`).classList.remove('text-slate-400');
+        document.getElementById(`btn-nav-${tab}`).classList.add('text-bn');
+        resetearTimerSesion();
+    }
+
+    // ─────────────────────────────────────────────
+    //  TEMPORIZADOR SESIÓN (RNF-003)
+    // ─────────────────────────────────────────────
+    function iniciarTimerSesion() {
+        sessionSecondsLeft = 300;
+        clearInterval(sessionTimerInterval);
+        document.getElementById('session-timer-badge').classList.remove('hidden');
+        sessionTimerInterval = setInterval(() => {
+            sessionSecondsLeft--;
+            const m = Math.floor(sessionSecondsLeft / 60);
+            const s = String(sessionSecondsLeft % 60).padStart(2, '0');
+            document.getElementById('session-timer-text').innerText = `${m}:${s}`;
+            if (sessionSecondsLeft <= 0) {
+                clearInterval(sessionTimerInterval);
+                Swal.fire({
+                    icon: 'warning', title: 'Sesión expirada',
+                    text: 'Tu sesión cerró por inactividad (5 min).',
+                    confirmButtonColor: '#73122b', allowOutsideClick: false
+                }).then(() => cerrarSesion());
             }
+        }, 1000);
+    }
+    function resetearTimerSesion() {
+        if (sessionTimerInterval) {
+            sessionSecondsLeft = 300;
+        }
+    }
+    document.addEventListener('click', resetearTimerSesion);
+    document.addEventListener('keydown', resetearTimerSesion);
 
-            fetch(`${BASE_API}/auth`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni: dniInput, pin: pinInput })
+    // ─────────────────────────────────────────────
+    //  AUTENTICACIÓN (RF-002 / HU-AP-05)
+    // ─────────────────────────────────────────────
+    function autenticarAcceso() {
+        const dniInput = document.getElementById('login-dni').value.trim();
+        const pinInput = document.getElementById('login-pin').value.trim();
+
+        if (!dniInput || !pinInput)
+            return Swal.fire({ icon: 'warning', title: 'Campos incompletos', text: 'Introduce tu DNI y PIN.', confirmButtonColor: '#73122b' });
+        if (!/^\d{8}$/.test(dniInput))
+            return Swal.fire({ icon: 'warning', title: 'DNI inválido', text: 'El DNI debe tener 8 dígitos.', confirmButtonColor: '#73122b' });
+        if (!/^\d{6}$/.test(pinInput))
+            return Swal.fire({ icon: 'warning', title: 'PIN inválido', text: 'El PIN debe tener 6 dígitos.', confirmButtonColor: '#73122b' });
+
+        fetch(`${BASE_API}/auth`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dni: dniInput, pin: pinInput })
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                // Mostrar aviso de intentos restantes si viene en la respuesta
+                if (data.intentosRestantes !== undefined) {
+                    document.getElementById('login-intentos-aviso').classList.remove('hidden');
+                    document.getElementById('login-intentos-texto').innerText =
+                        `⚠ Intentos restantes: ${data.intentosRestantes}`;
+                }
+                throw new Error(data.error || 'Credenciales inválidas');
+            }
+            return data;
+        })
+        .then(data => {
+            document.getElementById('login-intentos-aviso').classList.add('hidden');
+            localStorage.setItem('sessionToken', data.token || '');
+            const usuario = data.usuario || {};
+            localStorage.setItem('usuario', JSON.stringify(usuario));
+
+            document.getElementById('user-display-name').innerText =
+                (usuario.nombres || 'Usuario') + ' ' + (usuario.apellidos || '');
+            document.getElementById('wallet-id').innerText = usuario.billeteraId || '—';
+            saldoReal = usuario.saldoPEN || 0;
+            document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
+
+            document.getElementById('screen-login').classList.add('translate-y-[-100%]');
+            setTimeout(() => {
+                document.getElementById('screen-login').classList.add('hidden');
+                document.getElementById('screen-main').classList.remove('hidden');
+                document.getElementById('screen-main').classList.add('flex');
+                iniciarTimerSesion();
+            }, 300);
+
+            Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.',
+                confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+        })
+        .catch(err => {
+            Swal.fire({ icon: 'error', title: 'Acceso Denegado', text: err.message, confirmButtonColor: '#73122b' });
+        });
+    }
+
+    function autenticarBiometria() {
+        // Simulación de autenticación biométrica (RF-002)
+        Swal.fire({
+            icon: 'info', title: 'Autenticación Biométrica',
+            text: 'Coloca tu huella en el sensor del dispositivo...',
+            confirmButtonColor: '#73122b', timer: 2000, showConfirmButton: false,
+            didClose: () => {
+                // Simular éxito biométrico
+                document.getElementById('login-dni').value = '45678901';
+                autenticarAcceso();
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    //  REGISTRO (RF-001 / HU-REG-01)
+    // ─────────────────────────────────────────────
+    function capturarHuellaDigital() {
+        biometriaVerificada = true;
+        document.getElementById('lbl-huella').innerText = '✓ Huella Dactilar Capturada';
+        document.getElementById('lbl-huella').closest('button').classList.add('border-green-400', 'bg-green-50');
+        Swal.fire({ icon: 'success', title: 'Biometría capturada', text: 'Firma dactilar registrada correctamente.',
+            confirmButtonColor: '#73122b', timer: 1200, showConfirmButton: false });
+    }
+
+    function procesarRegistroBilletera() {
+        const dni      = document.getElementById('reg-dni').value.trim();
+        const celular  = document.getElementById('reg-celular').value.trim();
+        const nombres  = document.getElementById('reg-nombres').value.trim();
+        const apellidos= document.getElementById('reg-apellidos').value.trim();
+        const pin      = document.getElementById('reg-pin').value.trim();
+        const consent  = document.getElementById('reg-consentimiento').checked;
+
+        if (!dni || !celular || !nombres || !apellidos || !pin)
+            return Swal.fire({ icon: 'warning', title: 'Campos vacíos', text: 'Completa todos los campos del formulario.', confirmButtonColor: '#73122b' });
+        if (!biometriaVerificada)
+            return Swal.fire({ icon: 'info', title: 'Falta biometría', text: 'La captura de huella es obligatoria (SBS).', confirmButtonColor: '#73122b' });
+        if (!consent)
+            return Swal.fire({ icon: 'info', title: 'Consentimiento requerido', text: 'Debes aceptar la política de privacidad (Ley 29733).', confirmButtonColor: '#73122b' });
+
+        fetch(`${BASE_API}/registro`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                dni, celular, nombres, apellidos, pin,
+                biometria: { huella: 'simulada_base64==' }
             })
-            .then(async res => {
-                const text = await res.text();
-                const data = JSON.parse(text);
-                if (!res.ok) throw new Error(data.error || "Credenciales inválidas");
-                return data;
-            })
-            .then(data => {
-                localStorage.setItem('usuario', JSON.stringify(data.usuario));
-                document.getElementById('user-display-name').innerText = data.usuario?.nombres || "Jone";
-                document.getElementById('wallet-id').innerText = data.usuario?.billeteraId || "WP-777777";
-                document.getElementById('wallet-balance').innerText = data.usuario?.saldoPEN ? data.usuario.saldoPEN.toFixed(2) : "1450.00";
-                
-                document.getElementById('screen-login').classList.add('translate-y-[-100%]');
-                setTimeout(() => {
-                    document.getElementById('screen-login').classList.add('hidden');
-                    document.getElementById('screen-main').classList.remove('hidden');
-                    document.getElementById('screen-main').classList.add('flex');
-                }, 300);
-                Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
-            })
-            .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Acceso Denegado', text: err.message, confirmButtonColor: '#73122b' });
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'No se pudo registrar');
+            return data;
+        })
+        .then(data => {
+            Swal.fire({
+                icon: 'success', title: '¡Billetera Creada!',
+                html: `Tu cuenta fue registrada exitosamente.<br><small>ID: <strong>${data.billeteraId}</strong></small>`,
+                confirmButtonColor: '#73122b'
             });
+            regresarAlLogin();
+        })
+        .catch(err => {
+            Swal.fire({ icon: 'error', title: 'Error de Registro', text: err.message, confirmButtonColor: '#73122b' });
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    //  SALDO TOGGLE (RF-004)
+    // ─────────────────────────────────────────────
+    function toggleSaldo() {
+        saldoVisible = !saldoVisible;
+        const el = document.getElementById('wallet-balance');
+        const icon = document.getElementById('icon-eye');
+        el.innerText = saldoVisible ? saldoReal.toFixed(2) : '••••••';
+        icon.className = saldoVisible ? 'fa-solid fa-eye-slash text-sm' : 'fa-solid fa-eye text-sm';
+    }
+
+    // ─────────────────────────────────────────────
+    //  TRANSFERENCIAS (RF-005 / RF-006)
+    // ─────────────────────────────────────────────
+    function abrirModalTransferir(tipo) {
+        document.getElementById('modal-tx-type').value = tipo;
+        document.getElementById('modal-tx-title').innerText =
+            tipo === 'intrabanco' ? 'Transferencia Directa (NaciónPay)' : 'Transferencia Interbancaria CCE';
+        document.getElementById('campo-celular-wrap').classList.toggle('hidden', tipo !== 'intrabanco');
+        document.getElementById('campo-cci-wrap').classList.toggle('hidden', tipo !== 'interbanco');
+        document.getElementById('modal-tx').classList.remove('hidden');
+    }
+    function cerrarModalTransferir() {
+        document.getElementById('modal-tx').classList.add('hidden');
+        document.getElementById('modal-tx-amount').value = '';
+        document.getElementById('modal-tx-phone').value = '';
+        document.getElementById('modal-tx-cci').value = '';
+    }
+
+    function procesarEnvioDinero() {
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        if (!usuario.billeteraId)
+            return Swal.fire({ icon: 'error', title: 'Error de Sesión', text: 'No se encontró tu billetera.', confirmButtonColor: '#73122b' });
+
+        const monto = parseFloat(document.getElementById('modal-tx-amount').value);
+        const tipo  = document.getElementById('modal-tx-type').value;
+
+        if (!monto || monto <= 0)
+            return Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto mayor a 0.', confirmButtonColor: '#73122b' });
+
+        let body = { billeteraOrigenId: usuario.billeteraId, monto };
+        let endpoint;
+
+        if (tipo === 'intrabanco') {
+            const celular = document.getElementById('modal-tx-phone').value.trim();
+            if (!celular)
+                return Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Ingresa el celular destino.', confirmButtonColor: '#73122b' });
+            body.celularDestino = celular;
+            endpoint = 'transferencia/intrabanco';
+        } else {
+            const cci = document.getElementById('modal-tx-cci').value.trim();
+            if (!/^\d{20}$/.test(cci))
+                return Swal.fire({ icon: 'warning', title: 'CCI inválido', text: 'El CCI debe tener 20 dígitos.', confirmButtonColor: '#73122b' });
+            if (monto > 30000)
+                return Swal.fire({ icon: 'warning', title: 'Tope CCE excedido', text: 'El monto supera el límite regulatorio de S/ 30,000.', confirmButtonColor: '#73122b' });
+            body.cci = cci;
+            endpoint = 'transferencia/interbanco';
         }
 
-        function capturarHuellaDigital() {
-            biometriaVerificada = true;
-            document.getElementById('lbl-huella').innerText = "Huella Dactilar Capturada";
-            Swal.fire({ icon: 'success', title: 'Biometría Correcta', text: 'Firma dactilar guardada en el buffer del sistema.', confirmButtonColor: '#73122b', timer: 1200, showConfirmButton: false });
+        fetch(`${BASE_API}/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Operación rechazada');
+            return data;
+        })
+        .then(data => {
+            cerrarModalTransferir();
+            saldoReal = Math.max(0, saldoReal - monto);
+            document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
+            agregarMovimiento(`Transferencia ${tipo}`, monto, 'salida', data.referencia || data.referenciaCCE || '');
+            Swal.fire({ icon: 'success', title: 'Transferencia Enviada',
+                html: `S/ ${monto.toFixed(2)} enviados correctamente.<br><small>Ref: ${data.referencia || data.referenciaCCE || ''}</small>`,
+                confirmButtonColor: '#059669' });
+        })
+        .catch(err => {
+            cerrarModalTransferir();
+            Swal.fire({ icon: 'error', title: 'Operación Fallida', text: err.message, confirmButtonColor: '#73122b' });
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    //  PAGO QR (RF-007)
+    // ─────────────────────────────────────────────
+    let qrSimulado = null;
+    function abrirModalQR() { document.getElementById('modal-qr').classList.remove('hidden'); }
+    function cerrarModalQR() {
+        document.getElementById('modal-qr').classList.add('hidden');
+        document.getElementById('qr-monto-wrap').classList.add('hidden');
+        qrSimulado = null;
+    }
+    function simularEscaneoQR() {
+        const montoQR = (Math.random() * 200 + 10).toFixed(2);
+        const comercio = ['KFC Centro Cívico','Wong San Isidro','Tambo+','Metro Miraflores'][Math.floor(Math.random()*4)];
+        qrSimulado = { monto: parseFloat(montoQR), comercio, generadoEn: Date.now() };
+        document.getElementById('qr-comercio-nombre').innerText = comercio;
+        document.getElementById('qr-monto-valor').innerText = `S/ ${montoQR}`;
+        document.getElementById('qr-monto-wrap').classList.remove('hidden');
+        Swal.fire({ icon: 'success', title: 'QR Escaneado', text: `Comercio: ${comercio} · S/ ${montoQR}`,
+            confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+    }
+    function confirmarPagoQR() {
+        if (!qrSimulado) return;
+        const ahora = Date.now();
+        if (ahora - qrSimulado.generadoEn > 5 * 60 * 1000)
+            return Swal.fire({ icon: 'error', title: 'QR Expirado', text: 'El código QR expiró. Solicita uno nuevo al comercio.', confirmButtonColor: '#73122b' });
+        if (saldoReal < qrSimulado.monto)
+            return Swal.fire({ icon: 'error', title: 'Saldo Insuficiente', text: `Saldo disponible: S/ ${saldoReal.toFixed(2)}`, confirmButtonColor: '#73122b' });
+
+        saldoReal = Math.max(0, saldoReal - qrSimulado.monto);
+        document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
+        agregarMovimiento(`Pago QR · ${qrSimulado.comercio}`, qrSimulado.monto, 'salida', 'QR-' + Date.now());
+        cerrarModalQR();
+        Swal.fire({ icon: 'success', title: 'Pago QR Exitoso', text: `S/ ${qrSimulado.monto.toFixed(2)} pagados a ${qrSimulado.comercio}`,
+            confirmButtonColor: '#059669', timer: 2000, showConfirmButton: false });
+    }
+
+    // ─────────────────────────────────────────────
+    //  PAGO SERVICIOS (RF-008)
+    // ─────────────────────────────────────────────
+    let deudaServicio = 0;
+    function abrirModalServicios() { document.getElementById('modal-servicios').classList.remove('hidden'); }
+    function cerrarModalServicios() {
+        document.getElementById('modal-servicios').classList.add('hidden');
+        document.getElementById('srv-deuda-wrap').classList.add('hidden');
+        document.getElementById('srv-codigo').value = '';
+        deudaServicio = 0;
+    }
+    function consultarDeudaServicio() {
+        const codigo = document.getElementById('srv-codigo').value.trim();
+        const tipo   = document.getElementById('srv-tipo').value;
+        if (!codigo)
+            return Swal.fire({ icon: 'warning', title: 'Código requerido', text: 'Ingresa el código de suministro.', confirmButtonColor: '#73122b' });
+
+        // Simulación de consulta al operador
+        deudaServicio = parseFloat((Math.random() * 300 + 20).toFixed(2));
+        document.getElementById('srv-monto-deuda').innerText = `S/ ${deudaServicio.toFixed(2)}`;
+        document.getElementById('srv-deuda-wrap').classList.remove('hidden');
+        Swal.fire({ icon: 'info', title: 'Deuda encontrada', text: `${tipo.toUpperCase()} · Código: ${codigo} · Deuda: S/ ${deudaServicio.toFixed(2)}`,
+            confirmButtonColor: '#73122b', timer: 2000, showConfirmButton: false });
+    }
+    function confirmarPagoServicio() {
+        if (saldoReal < deudaServicio)
+            return Swal.fire({ icon: 'error', title: 'Saldo insuficiente', text: `Saldo: S/ ${saldoReal.toFixed(2)}`, confirmButtonColor: '#73122b' });
+        const tipo = document.getElementById('srv-tipo').value;
+        saldoReal = Math.max(0, saldoReal - deudaServicio);
+        document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
+        agregarMovimiento(`Pago ${tipo}`, deudaServicio, 'salida', 'SRV-' + Date.now());
+        cerrarModalServicios();
+        Swal.fire({ icon: 'success', title: 'Servicio Pagado', text: `S/ ${deudaServicio.toFixed(2)} pagados correctamente.`,
+            confirmButtonColor: '#059669', timer: 2000, showConfirmButton: false });
+    }
+
+    // ─────────────────────────────────────────────
+    //  MOVIMIENTOS (RF-004)
+    // ─────────────────────────────────────────────
+    function agregarMovimiento(descripcion, monto, tipo, referencia) {
+        const lista = document.getElementById('transactions-list');
+        const vacio = lista.querySelector('p');
+        if (vacio) vacio.remove();
+
+        const isEntrada = tipo === 'entrada';
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between text-sm pb-1 border-b border-slate-100';
+        div.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full ${isEntrada ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'} flex items-center justify-center text-xs">
+                    <i class="fa-solid ${isEntrada ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-slate-800 text-xs">${descripcion}</p>
+                    <p class="text-[10px] text-slate-400">${new Date().toLocaleTimeString('es-PE')} · ${referencia.slice(-8)}</p>
+                </div>
+            </div>
+            <span class="font-bold ${isEntrada ? 'text-emerald-600' : 'text-slate-800'} text-xs">
+                ${isEntrada ? '+' : '-'} S/. ${monto.toFixed(2)}
+            </span>`;
+        lista.prepend(div);
+        resetearTimerSesion();
+    }
+
+    // ─────────────────────────────────────────────
+    //  CURSOS (RF-010 / HU-ICF-09)
+    // ─────────────────────────────────────────────
+    function inscribirseEnCurso(idCurso, nombre) {
+        if (inscripciones[idCurso]) {
+            Swal.fire({ icon: 'info', title: '¡Ya estás inscrito!', text: 'Continúa desde donde lo dejaste.', confirmButtonColor: '#73122b' });
+            return lanzarModuloVideo(idCurso, nombre);
         }
+        inscripciones[idCurso] = { progreso: 0, nombre };
+        document.getElementById(`btn-${idCurso}`).innerText = 'Continuar';
+        document.getElementById(`progreso-${idCurso}`).classList.remove('hidden');
+        Swal.fire({ icon: 'success', title: 'Inscripción Exitosa', text: `¡Bienvenido a "${nombre}"! Progreso: 0%.`,
+            confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+        lanzarModuloVideo(idCurso, nombre);
+    }
 
-        function procesarRegistroBilletera() {
-            const dniVal = document.getElementById('reg-dni').value;
-            const celularVal = document.getElementById('reg-celular').value;
-            const nombresVal = document.getElementById('reg-nombres').value;
-            const pinVal = document.getElementById('reg-pin').value;
-
-            if (!dniVal || !celularVal || !nombresVal || !pinVal) {
-                return Swal.fire({ icon: 'warning', title: 'Campos Vacíos', text: 'Por favor, completa todo el formulario de alta.', confirmButtonColor: '#73122b' });
+    function lanzarModuloVideo(idCurso, nombre) {
+        document.getElementById('video-player-container').classList.remove('hidden');
+        document.getElementById('video-player-title').innerText = `${nombre} — Módulo 1`;
+        // Simular progreso
+        let p = inscripciones[idCurso]?.progreso || 0;
+        const intervalo = setInterval(() => {
+            p = Math.min(100, p + 10);
+            if (inscripciones[idCurso]) inscripciones[idCurso].progreso = p;
+            document.getElementById(`pct-${idCurso}`).innerText = `${p}%`;
+            document.getElementById(`bar-${idCurso}`).style.width = `${p}%`;
+            document.getElementById('progress-bar').style.width = `${p}%`;
+            if (p >= 100) {
+                clearInterval(intervalo);
+                Swal.fire({ icon: 'success', title: '¡Curso Completado!',
+                    html: `Felicitaciones. Tu certificado digital está disponible.<br><small>Curso: ${nombre}</small>`,
+                    confirmButtonColor: '#73122b' });
             }
-            if (!biometriaVerificada) {
-                return Swal.fire({ icon: 'info', title: 'Falta Biometría', text: 'La captura de huella es obligatoria para cumplir la norma.', confirmButtonColor: '#73122b' });
+        }, 3000);
+    }
+
+    function cerrarVideoPlayer() {
+        document.getElementById('video-player-container').classList.add('hidden');
+    }
+
+    // ─────────────────────────────────────────────
+    //  CHATBOT (RF-011)
+    // ─────────────────────────────────────────────
+    const respuestasChatbot = {
+        'recarg': 'Puedes recargar en cualquier Agente Multired autorizado. Muestra tu DNI y el monto a recargar.',
+        'transfer': 'Para transferir: ve a Inicio → Transferencia Directa (intrabanco) o CCE (interbanco).',
+        'saldo': 'Tu saldo aparece en la pantalla principal. Toca el ícono 👁 para mostrar u ocultar.',
+        'bloqueo': 'Si tu cuenta está bloqueada, espera 30 minutos o comunícate con el BN.',
+        'qr': 'Para pagar con QR: ve a Inicio → Pago QR y escanea el código del comercio.',
+        'reclam': 'Registra tu reclamo en la pestaña Ayuda. Recibirás un ticket en menos de 60 segundos.',
+        'servicio': 'Paga agua, luz, gas y telefonía en Inicio → Pagar Servicio.',
+        'curso': 'Accede a cursos gratuitos en la pestaña Cursos. Obtendrás un certificado al completar.',
+    };
+
+    function enviarMensajeChatbot() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+        input.value = '';
+
+        agregarBurbujaChatbot(msg, 'usuario');
+
+        setTimeout(() => {
+            const clave = Object.keys(respuestasChatbot).find(k => msg.toLowerCase().includes(k));
+            if (clave) {
+                agregarBurbujaChatbot(respuestasChatbot[clave], 'bot');
+            } else {
+                agregarBurbujaChatbot('No puedo resolver esa consulta. Te derivo a un operador. Ticket generado: TK-' + Date.now().toString().slice(-6), 'bot');
             }
+        }, 800);
+    }
 
-            fetch(`${BASE_API}/registro`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dni: dniVal, celular: celularVal, nombres: nombresVal, pin: pinVal })
-            })
-            .then(async res => {
-                const text = await res.text();
-                const data = JSON.parse(text);
-                if (!res.ok) throw new Error(data.error || "No se pudo registrar");
-                return data;
-            })
-            .then(() => {
-                Swal.fire({ icon: 'success', title: '¡Billetera Creada!', text: 'Se registró tu cuenta de manera exitosa.', confirmButtonColor: '#73122b' });
-                regresarAlLogin();
-            })
-            .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Fallo de Registro', text: err.message, confirmButtonColor: '#73122b' });
-            });
+    function agregarBurbujaChatbot(texto, origen) {
+        const contenedor = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = `flex gap-2 ${origen === 'usuario' ? 'justify-end' : ''}`;
+        if (origen === 'bot') {
+            div.innerHTML = `
+                <div class="w-6 h-6 bn-red rounded-full flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-robot text-white text-[9px]"></i>
+                </div>
+                <div class="bg-slate-100 px-3 py-2 rounded-xl rounded-tl-none text-xs text-slate-700 max-w-[80%]">${texto}</div>`;
+        } else {
+            div.innerHTML = `<div class="bg-red-700 px-3 py-2 rounded-xl rounded-tr-none text-xs text-white max-w-[80%]">${texto}</div>`;
         }
+        contenedor.appendChild(div);
+        contenedor.scrollTop = contenedor.scrollHeight;
+    }
 
-        function cambiarPestaña(tab) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.remove('text-yape'));
-            document.querySelectorAll('nav button').forEach(el => el.classList.add('text-slate-400'));
+    // ─────────────────────────────────────────────
+    //  RECLAMOS (RF-012)
+    // ─────────────────────────────────────────────
+    function registrarReclamo() {
+        const motivo = document.getElementById('reclamo-motivo').value.trim();
+        const opRef  = document.getElementById('reclamo-operacion').value.trim();
 
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-nav-${tab}`).classList.remove('text-slate-400');
-            document.getElementById(`btn-nav-${tab}`).classList.add('text-yape');
+        if (motivo.length < 10)
+            return Swal.fire({ icon: 'warning', title: 'Descripción muy corta', text: 'Mínimo 10 caracteres para el motivo.', confirmButtonColor: '#73122b' });
+
+        const ticket = {
+            id: 'RCL-2025-' + String(tickets.length + 1).padStart(6, '0'),
+            motivo, opRef,
+            estado: 'Pendiente',
+            fecha: new Date().toLocaleString('es-PE')
+        };
+        tickets.push(ticket);
+        renderizarTickets();
+
+        document.getElementById('reclamo-motivo').value = '';
+        document.getElementById('reclamo-operacion').value = '';
+
+        Swal.fire({ icon: 'success', title: 'Ticket Generado',
+            html: `Ticket: <strong>${ticket.id}</strong><br>Estado: Pendiente<br>Un operador te atenderá pronto.`,
+            confirmButtonColor: '#73122b' });
+    }
+
+    function renderizarTickets() {
+        const lista = document.getElementById('tickets-list');
+        if (!tickets.length) {
+            lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-2">No hay tickets registrados.</p>';
+            return;
         }
+        lista.innerHTML = tickets.map(t => `
+            <div class="flex justify-between items-start py-2 border-b border-slate-100 last:border-0">
+                <div>
+                    <p class="text-xs font-bold text-slate-800">${t.id}</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">${t.motivo.slice(0, 40)}${t.motivo.length > 40 ? '...' : ''}</p>
+                    <p class="text-[10px] text-slate-400">${t.fecha}</p>
+                </div>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    t.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700' :
+                    t.estado === 'Resuelto'  ? 'bg-emerald-100 text-emerald-700' :
+                    'bg-slate-100 text-slate-600'}">${t.estado}</span>
+            </div>`).join('');
+    }
 
-        function lanzarModuloVideo(nombreCurso) {
-            document.getElementById('video-player-container').classList.remove('hidden');
-            document.getElementById('video-player-title').innerText = `Reproduciendo: ${nombreCurso} - Video Instructivo 1`;
-            Swal.fire({ icon: 'success', title: 'Inscripción Exitosa', text: 'Iniciando reproducción multimedia instructiva.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+    // ─────────────────────────────────────────────
+    //  ANTIFRAUDE SIMULADOR (RF-013)
+    // ─────────────────────────────────────────────
+    function simularPatronLAFT() {
+        const count = parseInt(document.getElementById('sim-count').value) || 0;
+        const monto = parseFloat(document.getElementById('sim-monto').value) || 0;
+
+        const UMBRAL_COUNT = 15;
+        const UMBRAL_MONTO = 1800;
+
+        const ahora = Date.now();
+        const historial = Array.from({ length: count - 1 }, (_, i) => ({
+            monto, timestamp: ahora - (count - 1 - i) * 60000
+        }));
+        const nuevaTx = { monto, timestamp: ahora };
+
+        const enVentana = historial.filter(tx => tx.monto > UMBRAL_MONTO && (ahora - tx.timestamp) < 7200000);
+        const todasSospechosas = monto > UMBRAL_MONTO ? [...enVentana, nuevaTx] : enVentana;
+        const esPatron = todasSospechosas.length >= UMBRAL_COUNT;
+
+        const resultado = document.getElementById('sim-resultado');
+        resultado.classList.remove('hidden');
+
+        if (esPatron) {
+            resultado.className = 'text-xs p-3 rounded-lg font-medium bg-red-50 text-red-700 border border-red-200';
+            resultado.innerHTML = `🚨 <strong>ALERTA LAFT — Patrón de Estructuración Detectado</strong><br>
+                ${count} transacciones de S/ ${monto.toFixed(2)} en &lt; 2h.<br>
+                Cuenta bloqueada preventivamente. Equipo de cumplimiento notificado.`;
+        } else {
+            resultado.className = 'text-xs p-3 rounded-lg font-medium bg-emerald-50 text-emerald-700 border border-emerald-200';
+            resultado.innerHTML = `✅ <strong>Sin alertas</strong><br>
+                ${count} transacciones analizadas. Patrón dentro de parámetros normales.`;
         }
+    }
 
-        function cerrarVideoPlayer() {
-            document.getElementById('video-player-container').classList.add('hidden');
-        }
-
-        function cerrarSesion() {
-            localStorage.removeItem('usuario');
-            document.getElementById('screen-main').classList.remove('flex');
-            document.getElementById('screen-main').classList.add('hidden');
-            document.getElementById('screen-login').classList.remove('hidden');
-            document.getElementById('screen-login').classList.remove('translate-y-[-100%]');
-            document.getElementById('login-dni').value = '';
-            document.getElementById('login-pin').value = '';
-        }
-
-        function abrirModalTransferir(tipo) {
-            document.getElementById('modal-tx-type').value = tipo;
-            document.getElementById('modal-tx-title').innerText = tipo === 'intrabanco' ? 'Transferencia Directa (NaciónPay)' : 'Transferencia Interbancaria CCE';
-            document.getElementById('modal-tx').classList.remove('hidden');
-        }
-
-        function cerrarModalTransferir() {
-            document.getElementById('modal-tx').classList.add('hidden');
-            document.getElementById('modal-tx-amount').value = '';
-            document.getElementById('modal-tx-phone').value = '';
-        }
-
-        function procesarEnvioDinero() {
-            const usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
-            if (!usuarioLogueado || !usuarioLogueado.billeteraId) {
-                return Swal.fire({ icon: 'error', title: 'Error de Sesión', text: 'No se encontró tu billetera de origen.', confirmButtonColor: '#73122b' });
-            }
-
-            const monto = parseFloat(document.getElementById('modal-tx-amount').value);
-            const celular = document.getElementById('modal-tx-phone').value;
-            const tipo = document.getElementById('modal-tx-type').value;
-
-            if (!monto || !celular) {
-                return Swal.fire({ icon: 'warning', title: 'Error', text: 'Ingresa un monto y un número celular válido.', confirmButtonColor: '#73122b' });
-            }
-
-            const endpoint = tipo === 'intrabanco' ? 'transferencia/intrabanco' : 'transferencia/interbanco';
-
-            fetch(`${BASE_API}/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    billeteraOrigenId: usuarioLogueado.billeteraId,
-                    monto: monto, 
-                    celularDestino: celular 
-                })
-            })
-            .then(async res => {
-                const text = await res.text();
-                const data = JSON.parse(text);
-                if (!res.ok) throw new Error(data.error || "Operación denegada");
-                return data;
-            })
-            .then(() => {
-                cerrarModalTransferir();
-                usuarioLogueado.saldoPEN -= monto;
-                localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
-                document.getElementById('wallet-balance').innerText = usuarioLogueado.saldoPEN.toFixed(2);
-                Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación completada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
-            })
-            .catch(err => {
-                cerrarModalTransferir();
-                Swal.fire({ icon: 'error', title: 'Operación ' + (tipo === 'intrabanco' ? 'Rechazada' : 'Fallida'), text: err.message, confirmButtonColor: '#73122b' });
-            });
-        }
-
-        function auditarAlertasEnVivo() {
-            fetch(`${BASE_API}/antifraude/verificar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ historial: [], nuevaTx: {} })
-            })
-            .then(async res => {
-                const text = await res.text();
-                const data = JSON.parse(text);
-                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Análisis del motor: Cero patrones críticos de estructuración (pitufeo) detectados.', icon: 'info', confirmButtonColor: '#73122b' });
-            })
-            .catch(() => {
-                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Análisis simulación: No se registran alertas de fraccionamiento sospechoso (Límites bajo umbral).', icon: 'info', confirmButtonColor: '#73122b' });
-            });
-        }
-    </script>
+    // ─────────────────────────────────────────────
+    //  CERRAR SESIÓN
+    // ─────────────────────────────────────────────
+    function cerrarSesion() {
+        clearInterval(sessionTimerInterval);
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('sessionToken');
+        document.getElementById('screen-main').classList.remove('flex');
+        document.getElementById('screen-main').classList.add('hidden');
+        document.getElementById('screen-login').classList.remove('hidden', 'translate-y-[-100%]');
+        document.getElementById('login-dni').value = '';
+        document.getElementById('login-pin').value = '';
+        document.getElementById('login-intentos-aviso').classList.add('hidden');
+        document.getElementById('session-timer-badge').classList.add('hidden');
+        document.getElementById('transactions-list').innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay movimientos registrados aún.</p>';
+        saldoReal = 0;
+        Object.keys(inscripciones).forEach(k => delete inscripciones[k]);
+        tickets.length = 0;
+    }
+</script>
 </body>
 </html>
