@@ -1,36 +1,49 @@
+const { MAX_INTENTOS, VENTANA_BLOQUEO_MS, BLOQUEO_DURACION_MS } = require('../config');
+
 class IntentosTracker {
-  constructor() { this.intentos = new Map(); }
+  constructor() {
+    this._map = new Map();
+  }
+
   registrarFallo(dni) {
-    const ahora = Date.now();
-    if (!this.intentos.has(dni)) {
-      this.intentos.set(dni, { conteo: 0, ultimoIntento: ahora, bloqueadoHasta: null });
+    const r = this._get(dni);
+    r.count++;
+    if (r.count >= MAX_INTENTOS) {
+      r.bloqueadoHasta = Date.now() + BLOQUEO_DURACION_MS;
     }
-    const registro = this.intentos.get(dni);
-    if (registro.bloqueadoHasta && ahora < registro.bloqueadoHasta) {
-      return { bloqueado: true, tiempoRestante: registro.bloqueadoHasta - ahora };
-    }
-    registro.conteo += 1;
-    registro.ultimoIntento = ahora;
-    if (registro.conteo >= 5) {
-      registro.bloqueadoHasta = ahora + 300000;
-      registro.conteo = 0;
-      return { bloqueado: true, tiempoRestante: 300000 };
-    }
-    return { bloqueado: false, intentosRestantes: 5 - registro.conteo };
+    this._map.set(dni, r);
   }
+
   estaBloqueado(dni) {
-    const ahora = Date.now();
-    const registro = this.intentos.get(dni);
-    if (!registro) return false;
-    return !!(registro.bloqueadoHasta && ahora < registro.bloqueadoHasta);
+    const r = this._get(dni);
+    if (r.bloqueadoHasta && Date.now() < r.bloqueadoHasta) return true;
+    if (r.bloqueadoHasta && Date.now() >= r.bloqueadoHasta) {
+      this._map.delete(dni);
+      return false;
+    }
+    return r.count >= MAX_INTENTOS;
   }
-  limpiarContador(dni) { this.intentos.delete(dni); }
-  obtenerTiempoRestante(dni) {
+
+  limpiar(dni) {
+    this._map.delete(dni);
+  }
+
+  tiempoRestanteBloqueo(dni) {
     const ahora = Date.now();
-    const registro = this.intentos.get(dni);
+    const registro = this._map.get(dni);
     if (!registro || !registro.bloqueadoHasta) return 0;
     const restante = registro.bloqueadoHasta - ahora;
     return restante > 0 ? restante : 0;
   }
+
+  _get(dni) {
+    const r = this._map.get(dni) || { count: 0, since: Date.now(), bloqueadoHasta: null };
+    if (!r.bloqueadoHasta && Date.now() - r.since > VENTANA_BLOQUEO_MS) {
+      r.count = 0;
+      r.since = Date.now();
+    }
+    return r;
+  }
 }
+
 module.exports = { IntentosTracker };
