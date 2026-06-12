@@ -321,7 +321,11 @@
                 return data;
             })
             .then(data => {
+                localStorage.setItem('usuario', JSON.stringify(data.usuario));
                 document.getElementById('user-display-name').innerText = data.usuario?.nombres || "Jone";
+                document.getElementById('wallet-id').innerText = data.usuario?.billeteraId || "WP-777777";
+                document.getElementById('wallet-balance').innerText = data.usuario?.saldoPEN ? data.usuario.saldoPEN.toFixed(2) : "1450.00";
+                
                 document.getElementById('screen-login').classList.add('translate-y-[-100%]');
                 setTimeout(() => {
                     document.getElementById('screen-login').classList.add('hidden');
@@ -395,6 +399,7 @@
         }
 
         function cerrarSesion() {
+            localStorage.removeItem('usuario');
             document.getElementById('screen-main').classList.remove('flex');
             document.getElementById('screen-main').classList.add('hidden');
             document.getElementById('screen-login').classList.remove('hidden');
@@ -416,6 +421,11 @@
         }
 
         function procesarEnvioDinero() {
+            const usuarioLogueado = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuarioLogueado || !usuarioLogueado.billeteraId) {
+                return Swal.fire({ icon: 'error', title: 'Error de Sesión', text: 'No se encontró tu billetera de origen.', confirmButtonColor: '#73122b' });
+            }
+
             const monto = parseFloat(document.getElementById('modal-tx-amount').value);
             const celular = document.getElementById('modal-tx-phone').value;
             const tipo = document.getElementById('modal-tx-type').value;
@@ -429,7 +439,11 @@
             fetch(`${BASE_API}/${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ monto, celularDestino: celular })
+                body: JSON.stringify({ 
+                    billeteraOrigenId: usuarioLogueado.billeteraId,
+                    monto: monto, 
+                    celularDestino: celular 
+                })
             })
             .then(async res => {
                 const text = await res.text();
@@ -439,11 +453,14 @@
             })
             .then(() => {
                 cerrarModalTransferir();
+                usuarioLogueado.saldoPEN -= monto;
+                localStorage.setItem('usuario', JSON.stringify(usuarioLogueado));
+                document.getElementById('wallet-balance').innerText = usuarioLogueado.saldoPEN.toFixed(2);
                 Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación completada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
             })
             .catch(err => {
                 cerrarModalTransferir();
-                Swal.fire({ icon: 'error', title: 'Operación Rechazada', text: err.message, confirmButtonColor: '#73122b' });
+                Swal.fire({ icon: 'error', title: 'Operación ' + (tipo === 'intrabanco' ? 'Rechazada' : 'Fallida'), text: err.message, confirmButtonColor: '#73122b' });
             });
         }
 
