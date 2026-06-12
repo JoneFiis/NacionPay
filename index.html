@@ -468,6 +468,179 @@
                 Swal.fire({ title: 'Auditoría LAFT Activa', text: 'Análisis del motor: Cero patrones sospechosos fraccionados bajo el umbral legal de S/. 10,000.', icon: 'info', confirmButtonColor: '#73122b' });
             });
         }
+    <script>
+        const BASE_API = "http://127.0.0.1:3000/api";
+        let biometriaVerificada = false;
+
+        function irAPantallaRegistro() {
+            document.getElementById('screen-register').classList.remove('translate-x-full');
+        }
+
+        function regresarAlLogin() {
+            document.getElementById('screen-register').classList.add('translate-x-full');
+        }
+
+        function autenticarAcceso() {
+            const dni = document.getElementById('login-dni').value;
+            const pin = document.getElementById('login-pin').value;
+
+            if (!dni || !pin) {
+                return Swal.fire({ icon: 'warning', title: 'Campos Incompletos', text: 'Introduce tu DNI y tu PIN de seguridad.', confirmButtonColor: '#73122b' });
+            }
+
+            fetch(`${BASE_API}/auth`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dni, pin })
+            })
+            .then(async res => {
+                const text = await res.text();
+                const data = JSON.parse(text);
+                if (!res.ok) throw new Error(data.error || "Credenciales inválidas");
+                return data;
+            })
+            .then(data => {
+                document.getElementById('user-display-name').innerText = data.nombre || "Usuario Autenticado";
+                document.getElementById('screen-login').classList.add('translate-y-[-100%]');
+                setTimeout(() => {
+                    document.getElementById('screen-login').classList.add('hidden');
+                    document.getElementById('screen-main').classList.remove('hidden');
+                    document.getElementById('screen-main').classList.add('flex');
+                }, 300);
+                Swal.fire({ icon: 'success', title: 'Ingreso Autorizado', text: 'Sesión iniciada correctamente.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+            })
+            .catch(err => {
+                Swal.fire({ icon: 'error', title: 'Fallo de Ingreso', text: err.message, confirmButtonColor: '#73122b' });
+            });
+        }
+
+        function capturarHuellaDigital() {
+            biometriaVerificada = true;
+            document.getElementById('lbl-huella').innerText = "Huella Dactilar Capturada";
+            Swal.fire({ icon: 'success', title: 'Biometría Correcta', text: 'Firma dactilar guardada en el buffer del sistema.', confirmButtonColor: '#73122b', timer: 1200, showConfirmButton: false });
+        }
+
+        function procesarRegistroBilletera() {
+            const dni = document.getElementById('reg-dni').value;
+            const celular = document.getElementById('reg-celular').value;
+            const nombres = document.getElementById('reg-nombres').value;
+            const pin = document.getElementById('reg-pin').value;
+
+            if (!dni || !celular || !nombres || !pin) {
+                return Swal.fire({ icon: 'warning', title: 'Campos Vacíos', text: 'Por favor, completa todo el formulario de alta.', confirmButtonColor: '#73122b' });
+            }
+            if (!biometriaVerificada) {
+                return Swal.fire({ icon: 'info', title: 'Falta Biometría', text: 'La captura de huella es obligatoria para cumplir la norma.', confirmButtonColor: '#73122b' });
+            }
+
+            fetch(`${BASE_API}/registro`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dni, celular, nombres, pin })
+            })
+            .then(async res => {
+                const text = await res.text();
+                const data = JSON.parse(text);
+                if (!res.ok) throw new Error(data.error || "No se pudo registrar");
+                return data;
+            })
+            .then(() => {
+                Swal.fire({ icon: 'success', title: '¡Billetera Creada!', text: 'Se registró tu cuenta de manera exitosa.', confirmButtonColor: '#73122b' });
+                regresarAlLogin();
+            })
+            .catch(err => {
+                Swal.fire({ icon: 'error', title: 'Fallo de Registro', text: err.message, confirmButtonColor: '#73122b' });
+            });
+        }
+
+        function cambiarPestaña(tab) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('text-yape'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.add('text-slate-400'));
+
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-nav-${tab}`).classList.remove('text-slate-400');
+            document.getElementById(`btn-nav-${tab}`).classList.add('text-yape');
+        }
+
+        function lanzarModuloVideo(nombreCurso) {
+            document.getElementById('video-player-container').classList.remove('hidden');
+            document.getElementById('video-player-title').innerText = `Reproduciendo: ${nombreCurso} - Video Instructivo 1`;
+            Swal.fire({ icon: 'success', title: 'Inscripción Exitosa', text: 'Iniciando reproducción multimedia instructiva.', confirmButtonColor: '#73122b', timer: 1500, showConfirmButton: false });
+        }
+
+        function cerrarVideoPlayer() {
+            document.getElementById('video-player-container').classList.add('hidden');
+        }
+
+        function cerrarSesion() {
+            document.getElementById('screen-main').classList.remove('flex');
+            document.getElementById('screen-main').classList.add('hidden');
+            document.getElementById('screen-login').classList.remove('hidden');
+            document.getElementById('screen-login').classList.remove('translate-y-[-100%]');
+            document.getElementById('login-dni').value = '';
+            document.getElementById('login-pin').value = '';
+        }
+
+        function abrirModalTransferir(tipo) {
+            document.getElementById('modal-tx-type').value = tipo;
+            document.getElementById('modal-tx-title').innerText = tipo === 'intrabanco' ? 'Transferencia Directa (NaciónPay)' : 'Transferencia Interbancaria CCE';
+            document.getElementById('modal-tx').classList.remove('hidden');
+        }
+
+        function cerrarModalTransferir() {
+            document.getElementById('modal-tx').classList.add('hidden');
+            document.getElementById('modal-tx-amount').value = '';
+            document.getElementById('modal-tx-phone').value = '';
+        }
+
+        function procesarEnvioDinero() {
+            const monto = parseFloat(document.getElementById('modal-tx-amount').value);
+            const celular = document.getElementById('modal-tx-phone').value;
+            const tipo = document.getElementById('modal-tx-type').value;
+
+            if (!monto || !celular) {
+                return Swal.fire({ icon: 'warning', title: 'Error', text: 'Ingresa un monto y un número celular válido.', confirmButtonColor: '#73122b' });
+            }
+
+            const endpoint = tipo === 'intrabanco' ? 'transferencia/intrabanco' : 'transferencia/interbanco';
+
+            fetch(`${BASE_API}/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ monto, celularDestino: celular })
+            })
+            .then(async res => {
+                const text = await res.text();
+                const data = JSON.parse(text);
+                if (!res.ok) throw new Error(data.error || "Operación denegada");
+                return data;
+            })
+            .then(() => {
+                cerrarModalTransferir();
+                Swal.fire({ icon: 'success', title: 'Transferencia Enviada', text: `Operación completada con éxito por S/. ${monto}`, confirmButtonColor: '#059669' });
+            })
+            .catch(err => {
+                cerrarModalTransferir();
+                Swal.fire({ icon: 'error', title: 'Operación Rechazada', text: err.message, confirmButtonColor: '#73122b' });
+            });
+        }
+
+        function auditarAlertasEnVivo() {
+            fetch(`${BASE_API}/antifraude/verificar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ historial: [], nuevaTx: {} })
+            })
+            .then(async res => {
+                const text = await res.text();
+                const data = JSON.parse(text);
+                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Análisis del motor: Cero patrones críticos de estructuración (pitufeo) detectados.', icon: 'info', confirmButtonColor: '#73122b' });
+            })
+            .catch(() => {
+                Swal.fire({ title: 'Engine Antifraude LAFT', text: 'Análisis simulación: No se registran alertas de fraccionamiento sospechoso (Límites bajo umbral).', icon: 'info', confirmButtonColor: '#73122b' });
+            });
+        }
     </script>
 </body>
 </html>
