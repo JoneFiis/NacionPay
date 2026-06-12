@@ -1,18 +1,52 @@
-const { VENTANA_ESTRUCTURACION_MS, UMBRAL_CONTEO_ESTRUCTURACION, UMBRAL_MONTO_ESTRUCTURACION } = require('../config');
+const {
+  VENTANA_ESTRUCTURACION_MS,
+  UMBRAL_CONTEO_ESTRUCTURACION,
+  UMBRAL_MONTO_ESTRUCTURACION
+} = require('../config');
+
 class AntifraudeEngine {
   detectarPatronEstructuracion(historial, nuevaTx) {
-    if (!Array.isArray(historial)) throw new Error('El historial debe ser un array de transacciones');
-    if (!nuevaTx || !nuevaTx.timestamp || !nuevaTx.monto) throw new Error('La transacción debe contener timestamp y monto');
-    const timestampNueva = new Date(nuevaTx.timestamp).getTime();
-    const ventanaInicio = timestampNueva - VENTANA_ESTRUCTURACION_MS;
-    const transaccionesEnVentana = historial.filter(tx => {
-      const txTime = new Date(tx.timestamp).getTime();
-      return txTime >= ventanaInicio && txTime <= timestampNueva && tx.monto > UMBRAL_MONTO_ESTRUCTURACION;
-    });
-    transaccionesEnVentana.push({ id: nuevaTx.id || 'nueva', monto: nuevaTx.monto, timestamp: nuevaTx.timestamp });
-    const conteo = transaccionesEnVentana.length;
-    const montoTotal = transaccionesEnVentana.reduce((sum, tx) => sum + (tx.monto || 0), 0);
-    return { detectado: conteo >= UMBRAL_CONTEO_ESTRUCTURACION, conteo, montoTotal };
+    if (!Array.isArray(historial) || !nuevaTx) return false;
+    const enVentana = this._filtrarVentana(historial, nuevaTx.timestamp);
+    // Incluir la nueva transacción en el conteo
+    const todasSospechosas = this._esSospechoso(nuevaTx.monto)
+      ? [...enVentana, nuevaTx]
+      : enVentana;
+    return this._superaUmbral(todasSospechosas);
+  }
+
+  generarAlerta(dni, historial, nuevaTx) {
+    return {
+      tipo: 'ESTRUCTURACION_LAFT',
+      dni,
+      cantidadTransacciones: historial.length + 1,
+      montoPromedio: this._calcularPromedio(historial, nuevaTx),
+      ventanaHoras: VENTANA_ESTRUCTURACION_MS / (60 * 60 * 1000),
+      timestamp: new Date().toISOString(),
+      estado: 'PENDIENTE_REVISION'
+    };
+  }
+
+  _filtrarVentana(historial, ahora) {
+    return historial.filter(tx =>
+      (ahora - tx.timestamp) < VENTANA_ESTRUCTURACION_MS &&
+      this._esSospechoso(tx.monto)
+    );
+  }
+
+  _superaUmbral(txs) {
+    return txs.length >= UMBRAL_CONTEO_ESTRUCTURACION;
+  }
+
+  _esSospechoso(monto) {
+    return monto > UMBRAL_MONTO_ESTRUCTURACION;
+  }
+
+  _calcularPromedio(historial, nuevaTx) {
+    const todas = [...historial, nuevaTx];
+    const suma = todas.reduce((acc, tx) => acc + tx.monto, 0);
+    return Math.round((suma / todas.length) * 100) / 100;
   }
 }
+
 module.exports = { AntifraudeEngine };
