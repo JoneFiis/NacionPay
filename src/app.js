@@ -112,11 +112,13 @@ app.post('/api/transferencia/intrabanco', async (req, res) => {
       });
     }
 
-    const { data: userDest } = await supabase
-      .from('usuarios')
-      .select('billetera_id')
-      .eq('celular', String(celularReal))
-      .single();
+    const { data: usuarios } = await supabase
+  .from('usuarios')
+  .select('billetera_id')
+  .eq('celular', String(celularReal))
+  .limit(1);
+
+const userDest = usuarios?.[0] || null;
     
     // ← ESTE era el bug: userDest null lanzaba error genérico
     if (!userDest?.billetera_id) {
