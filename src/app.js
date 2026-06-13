@@ -93,8 +93,9 @@ app.post('/api/auth', async (req, res) => {
 
 app.post('/api/transferencia/intrabanco', async (req, res) => {
   try {
-    const { billeteraOrigenId, monto, celularDestino } = req.body;
-    const { data } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularDestino)).single();
+    const { billeteraOrigenId, monto, celularDestino, celular } = req.body;
+    const celularReal = celularDestino || celular;
+    const { data } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
     const resultado = await ejecutarTransferenciaIntrabanco({ origenId: billeteraOrigenId, destinoId: data?.billetera_id, monto }, repositorio);
     res.json(resultado);
   } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); }
@@ -102,8 +103,9 @@ app.post('/api/transferencia/intrabanco', async (req, res) => {
 
 app.post('/api/transferencia/interbanco', async (req, res) => {
   try {
-    const { billeteraOrigenId, monto, cciDestino } = req.body;
-    res.json(await procesarTransferenciaInterbanco({ origenId: billeteraOrigenId, cci: cciDestino, monto, moneda: 'PEN' }, repositorio, gatewaySimulado));
+    const { billeteraOrigenId, monto, cciDestino, cci } = req.body;
+    const cciReal = cciDestino || cci;
+    res.json(await procesarTransferenciaInterbanco({ origenId: billeteraOrigenId, cci: cciReal, monto, moneda: 'PEN' }, repositorio, gatewaySimulado));
   } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); }
 });
 
