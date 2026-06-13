@@ -109,7 +109,10 @@ app.post('/api/transferencia/interbanco', async (req, res) => {
 
 app.post('/api/antifraude/verificar', (req, res) => { res.json({ status: 'OK' }); });
 
+// Permitir que la nube asigne el puerto automáticamente
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => { console.log(`NaciónPay API en puerto 5000 y conectada a Supabase Cloud`); });
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`NaciónPay API corriendo en la nube y conectada a Supabase`);
+});
 
 module.exports = { app, repositorio, registrarUsuario, autenticarUsuario, verificarToken, ejecutarTransferenciaIntrabanco, procesarTransferenciaInterbanco, BilleteraService, AntifraudeEngine };
