@@ -99,18 +99,41 @@ app.post('/api/transferencia/intrabanco', async (req, res) => {
     let origenReal = billeteraOrigenId || billeteraId || origen;
     
     if (!origenReal || origenReal.length < 10) {
-      return res.status(400).json({ error: 'No se pudo recuperar el ID de origen correctamente. Inicie sesion de nuevo.' });
+      return res.status(400).json({ 
+        error: 'Sesión inválida. Cierra sesión e ingresa de nuevo.',
+        codigo: 'ORIGEN_INVALIDO'
+      });
     }
 
-    const { data: userDest } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
+    if (!celularReal) {
+      return res.status(400).json({ 
+        error: 'Ingresa el celular destino.',
+        codigo: 'DESTINO_REQUERIDO'
+      });
+    }
+
+    const { data: userDest } = await supabase
+      .from('usuarios')
+      .select('billetera_id')
+      .eq('celular', String(celularReal))
+      .single();
     
-    if (!origenReal || !userDest?.billetera_id) {
-      throw new Error('Origen y destino son obligatorios o invalidos');
+    // ← ESTE era el bug: userDest null lanzaba error genérico
+    if (!userDest?.billetera_id) {
+      return res.status(400).json({ 
+        error: `No se encontró ninguna cuenta NaciónPay asociada al celular ${celularReal}.`,
+        codigo: 'DESTINO_NO_ENCONTRADO'
+      });
     }
 
-    const resultado = await ejecutarTransferenciaIntrabanco({ origenId: origenReal, destinoId: userDest?.billetera_id, monto }, repositorio);
+    const resultado = await ejecutarTransferenciaIntrabanco(
+      { origenId: origenReal, destinoId: userDest.billetera_id, monto },
+      repositorio
+    );
     res.json(resultado);
-  } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); }
+  } catch (e) { 
+    res.status(400).json({ error: e.message, codigo: e.codigo }); 
+  }
 });
 
 app.post('/api/transferencia/interbanco', async (req, res) => {
