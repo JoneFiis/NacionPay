@@ -93,19 +93,40 @@ app.post('/api/auth', async (req, res) => {
 
 app.post('/api/transferencia/intrabanco', async (req, res) => {
   try {
-    const { billeteraOrigenId, monto, celularDestino, celular } = req.body;
+    const { billeteraOrigenId, billeteraId, origen, monto, celularDestino, celular } = req.body;
+    
     const celularReal = celularDestino || celular;
-    const { data } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
-    const resultado = await ejecutarTransferenciaIntrabanco({ origenId: billeteraOrigenId, destinoId: data?.billetera_id, monto }, repositorio);
+    const origenBuscado = billeteraOrigenId || billeteraId || origen;
+    
+    let origenReal = origenBuscado;
+    if (!origenReal || origenReal.length < 10) {
+      const { data: userOrig } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
+      origenReal = userOrig?.billetera_id;
+    }
+
+    const { data: userDest } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
+    
+    if (!origenReal || !userDest?.billetera_id) {
+      throw new Error('Origen y destino son obligatorios o invalidos');
+    }
+
+    const resultado = await ejecutarTransferenciaIntrabanco({ origenId: origenReal, destinoId: userDest?.billetera_id, monto }, repositorio);
     res.json(resultado);
   } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); }
 });
 
 app.post('/api/transferencia/interbanco', async (req, res) => {
   try {
-    const { billeteraOrigenId, monto, cciDestino, cci } = req.body;
+    const { billeteraOrigenId, billeteraId, origen, monto, cciDestino, cci } = req.body;
+    
     const cciReal = cciDestino || cci;
-    res.json(await procesarTransferenciaInterbanco({ origenId: billeteraOrigenId, cci: cciReal, monto, moneda: 'PEN' }, repositorio, gatewaySimulado));
+    const origenBuscado = billeteraOrigenId || billeteraId || origen;
+    
+    if (!origenBuscado || !cciReal) {
+      throw new Error('Origen y destino son obligatorios');
+    }
+
+    res.json(await procesarTransferenciaInterbanco({ origenId: origenBuscado, cci: cciReal, monto, moneda: 'PEN' }, repositorio, gatewaySimulado));
   } catch (e) { res.status(400).json({ error: e.message, codigo: e.codigo }); }
 });
 
