@@ -772,59 +772,77 @@
     }
 
     function procesarEnvioDinero() {
-        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-        if (!usuario.billeteraId)
-            return Swal.fire({ icon: 'error', title: 'Error de Sesión', text: 'No se encontró tu billetera.', confirmButtonColor: '#73122b' });
-
-        const monto = parseFloat(document.getElementById('modal-tx-amount').value);
-        const tipo  = document.getElementById('modal-tx-type').value;
-
-        if (!monto || monto <= 0)
-            return Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto mayor a 0.', confirmButtonColor: '#73122b' });
-
-        let body = { billeteraOrigenId: usuario.billeteraId, monto };
-        let endpoint;
-
-        if (tipo === 'intrabanco') {
-            const celular = document.getElementById('modal-tx-phone').value.trim();
-            if (!celular)
-                return Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Ingresa el celular destino.', confirmButtonColor: '#73122b' });
-            body.celularDestino = celular;
-            endpoint = 'transferencia/intrabanco';
-        } else {
-            const cci = document.getElementById('modal-tx-cci').value.trim();
-            if (!/^\d{20}$/.test(cci))
-                return Swal.fire({ icon: 'warning', title: 'CCI inválido', text: 'El CCI debe tener 20 dígitos.', confirmButtonColor: '#73122b' });
-            if (monto > 30000)
-                return Swal.fire({ icon: 'warning', title: 'Tope CCE excedido', text: 'El monto supera el límite regulatorio de S/ 30,000.', confirmButtonColor: '#73122b' });
-            body.cci = cci;
-            endpoint = 'transferencia/interbanco';
-        }
-
-        fetch(`${BASE_API}/${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` },
-            body: JSON.stringify(body)
-        })
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Operación rechazada');
-            return data;
-        })
-        .then(data => {
-            cerrarModalTransferir();
-            saldoReal = Math.max(0, saldoReal - monto);
-            document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
-            agregarMovimiento(`Transferencia ${tipo}`, monto, 'salida', data.referencia || data.referenciaCCE || '');
-            Swal.fire({ icon: 'success', title: 'Transferencia Enviada',
-                html: `S/ ${monto.toFixed(2)} enviados correctamente.<br><small>Ref: ${data.referencia || data.referenciaCCE || ''}</small>`,
-                confirmButtonColor: '#059669' });
-        })
-        .catch(err => {
-            cerrarModalTransferir();
-            Swal.fire({ icon: 'error', title: 'Operación Fallida', text: err.message, confirmButtonColor: '#73122b' });
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    
+    // Validación más explícita
+    if (!usuario || !usuario.billeteraId) {
+        return Swal.fire({ 
+            icon: 'error', 
+            title: 'Error de Sesión', 
+            text: 'No se encontró tu billetera. Cierra sesión e ingresa nuevamente.', 
+            confirmButtonColor: '#73122b' 
         });
     }
+
+    const monto = parseFloat(document.getElementById('modal-tx-amount').value);
+    const tipo  = document.getElementById('modal-tx-type').value;
+
+    if (!monto || monto <= 0)
+        return Swal.fire({ icon: 'warning', title: 'Monto inválido', text: 'Ingresa un monto mayor a 0.', confirmButtonColor: '#73122b' });
+
+    // Validar saldo antes de llamar al API
+    if (monto > saldoReal)
+        return Swal.fire({ icon: 'warning', title: 'Saldo insuficiente', text: `Tu saldo disponible es S/ ${saldoReal.toFixed(2)}`, confirmButtonColor: '#73122b' });
+
+    let body = { billeteraOrigenId: usuario.billeteraId, monto };
+    let endpoint;
+
+    if (tipo === 'intrabanco') {
+        const celular = document.getElementById('modal-tx-phone').value.trim();
+        if (!celular || !/^9\d{8}$/.test(celular))
+            return Swal.fire({ icon: 'warning', title: 'Celular inválido', text: 'El celular debe tener 9 dígitos y comenzar con 9.', confirmButtonColor: '#73122b' });
+        body.celularDestino = celular;
+        endpoint = 'transferencia/intrabanco';
+    } else {
+        const cci = document.getElementById('modal-tx-cci').value.trim();
+        if (!/^\d{20}$/.test(cci))
+            return Swal.fire({ icon: 'warning', title: 'CCI inválido', text: 'El CCI debe tener exactamente 20 dígitos.', confirmButtonColor: '#73122b' });
+        if (monto > 30000)
+            return Swal.fire({ icon: 'warning', title: 'Tope CCE excedido', text: 'El monto supera el límite regulatorio de S/ 30,000.', confirmButtonColor: '#73122b' });
+        body.cciDestino = cci;  // ← antes era body.cci, pero el endpoint lee cciDestino || cci
+        endpoint = 'transferencia/interbanco';
+    }
+
+    fetch(`${BASE_API}/${endpoint}`, {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` 
+        },
+        body: JSON.stringify(body)
+    })
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Operación rechazada');
+        return data;
+    })
+    .then(data => {
+        cerrarModalTransferir();
+        saldoReal = Math.max(0, saldoReal - monto);
+        document.getElementById('wallet-balance').innerText = saldoReal.toFixed(2);
+        agregarMovimiento(`Transferencia ${tipo}`, monto, 'salida', data.referencia || data.referenciaCCE || '');
+        Swal.fire({ 
+            icon: 'success', 
+            title: 'Transferencia Enviada',
+            html: `S/ ${monto.toFixed(2)} enviados correctamente.<br><small>Ref: ${data.referencia || data.referenciaCCE || ''}</small>`,
+            confirmButtonColor: '#059669' 
+        });
+    })
+    .catch(err => {
+        cerrarModalTransferir();
+        Swal.fire({ icon: 'error', title: 'Operación Fallida', text: err.message, confirmButtonColor: '#73122b' });
+    });
+}
 
     // ─────────────────────────────────────────────
     //  PAGO QR (RF-007)
