@@ -96,12 +96,10 @@ app.post('/api/transferencia/intrabanco', async (req, res) => {
     const { billeteraOrigenId, billeteraId, origen, monto, celularDestino, celular } = req.body;
     
     const celularReal = celularDestino || celular;
-    const origenBuscado = billeteraOrigenId || billeteraId || origen;
+    let origenReal = billeteraOrigenId || billeteraId || origen;
     
-    let origenReal = origenBuscado;
     if (!origenReal || origenReal.length < 10) {
-      const { data: userOrig } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
-      origenReal = userOrig?.billetera_id;
+      return res.status(400).json({ error: 'No se pudo recuperar el ID de origen correctamente. Inicie sesion de nuevo.' });
     }
 
     const { data: userDest } = await supabase.from('usuarios').select('billetera_id').eq('celular', String(celularReal)).single();
